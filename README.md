@@ -54,10 +54,10 @@ Contributing isn’t limited to just code. We encourage you to contribute in the
 
 Think you’ve found a bug? We’d love for you to help us get it fixed.
 
-Before you create a new issue, you should [search existing issues](https://github.com/chris-odell-focs/Block_Editor_Feature_Toggler/issues) to see if there’s an existing resolution to it, or if it’s already been fixed in a newer version.
+Before you create a new issue, you should [search existing issues](https://github.com/chris-odell-focs/Block_Editor_Customiser/issues) to see if there’s an existing resolution to it, or if it’s already been fixed in a newer version.
 
-Once you’ve done a bit of searching and discovered there isn’t an open or fixed issue for your bug, please [create a new issue](https://github.com/chris-odell-focs/Block_Editor_Feature_Toggler/issues/new). Include as much detail as you can, and clear steps to reproduce if possible.
+Once you’ve done a bit of searching and discovered there isn’t an open or fixed issue for your bug, please [create a new issue](https://github.com/chris-odell-focs/Block_Editor_Customiser/issues/new). Include as much detail as you can, and clear steps to reproduce if possible.
 
 ### Creating a pull request
 
-Want to contribute a new feature? Please first [open a new issue](https://github.com/chris-odell-focs/Block_Editor_Feature_Toggler/issues/new) to discuss whether the feature is a good fit for the project.
+Want to contribute a new feature? Please first [open a new issue](https://github.com/chris-odell-focs/Block_Editor_Customiser/issues/new) to discuss whether the feature is a good fit for the project.
