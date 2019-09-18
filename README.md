@@ -1,4 +1,4 @@
-chris-odell-focs/Block_Editor_Feature_Toggler
+chris-odell-focs/Block_Editor_Customiser
 ========================================
 
 A plugin for turning Block Editor Features on and off.
