@@ -18,8 +18,8 @@ or the two hooks provided which can be called with do_action.
 
 The two hooks are:-
 
-'FOFO_BEC_feature_on' to turn features on and
-'FOFO_BEC_feature_off' to turn features off.
+'fofo_bec_feature_on' to turn features on and
+'fofo_bec_feature_off' to turn features off.
 
 Currently supported features are :- 
 
@@ -32,9 +32,9 @@ Currently supported features are :-
  
 === Examples ===
 
-`do_action( 'FOFO_BEC_feature_off', 'category_panel' ); //this turns the category panel in the sidebar off.`
+`do_action( 'fofo_bec_feature_off', 'category_panel' ); //this turns the category panel in the sidebar off.`
 
-`do_action( 'FOFO_BEC_feature_on', 'category_panel' ); //this turns the category panel in the sidebar on, if it has been turned off.`
+`do_action( 'fofo_bec_feature_on', 'category_panel' ); //this turns the category panel in the sidebar on, if it has been turned off.`
 
 == Installation ==
 
