@@ -72,6 +72,15 @@ class FoFo_Bec {
     private $nonce_key = '';
 
     /**
+     * The current Bloc Editor Customiser theme
+     * 
+     * @var FoFoBec\FoFo_Bec_Theme  $current_bec_theme
+     * 
+     * @since 1.1.0
+     */
+    private $current_bec_theme;
+
+    /**
      * Initialise the plugin
      * 
      * @return  void
@@ -83,26 +92,41 @@ class FoFo_Bec {
         $this->do_wp_hooks();
         $this->do_our_hooks();
 
-        $this->option_defaults = [
-            FOFO_BEC_FEATURE_KEY_CATEGORY => 'on',
-            FOFO_BEC_FEATURE_KEY_TAG => 'on',
-            FOFO_BEC_FEATURE_KEY_FEAT_IMG => 'on',
-            FOFO_BEC_FEATURE_KEY_EXCERPT => 'on',
-            FOFO_BEC_FEATURE_KEY_DISCUSSION => 'on',
-            FOFO_BEC_FEATURE_KEY_PERMALINK => 'on'
-        ];
-        
-        $this->option_feature_names = [
-            FOFO_BEC_FEATURE_KEY_CATEGORY => 'Category Panel',
-            FOFO_BEC_FEATURE_KEY_TAG => 'Tags Panel',
-            FOFO_BEC_FEATURE_KEY_FEAT_IMG => 'Featured Image Panel',
-            FOFO_BEC_FEATURE_KEY_EXCERPT => 'Excerpt Panel',
-            FOFO_BEC_FEATURE_KEY_DISCUSSION => 'Discussion Panel',
-            FOFO_BEC_FEATURE_KEY_PERMALINK => 'Permalink Panel'
-        ];
+        $options = get_option( FOFO_BEC_OPTIONS_KEY, '' );
+        if( '' !== $options ) {
+            $this->convert_to_theme( $options );
+        }
 
-        $this->nonce_key = implode( '-', array_keys( $this->option_defaults ) );
-        $this->check_options_exist();
+        $serialised_theme = get_option( FOFO_BEC_CURRENT_THEME, '' );
+        $this->current_bec_theme = new \FoFoBec\FoFo_Bec_Theme();
+        $this->current_bec_theme->from_json( $serialised_theme );
+    }
+
+    /**
+     * Convert the options from the pevious version to a BEC theme
+     * 
+     * @param   array   $options {
+     *      @type   string  $key
+     *      @type   string  $value
+     * }
+     * 
+     * @return  void
+     * @since 1.1.0
+     */
+    private function convert_to_theme( $options ) {
+
+        $converted_theme = new \FoFoBec\FoFo_Bec_Theme();
+
+        $converted_theme->category_panel = $options[ 'category_panel' ];
+        $converted_theme->tag_panel = $options[ 'tag_panel' ];
+        $converted_theme->featured_image_panel = $options[ 'featured_image_panel' ];
+        $converted_theme->excerpt_panel = $options[ 'excerpt_panel' ];
+        $converted_theme->discussion_panel = $options[ 'discussion_panel' ];
+        $converted_theme->permalink_panel = $options[ 'permalink_panel' ];
+
+        //update the options
+        update_option( FOFO_BEC_CURRENT_THEME, $converted_theme->to_json() );
+        update_option( FOFO_BEC_OPTIONS_KEY, '' );
     }
 
     /**
@@ -117,29 +141,8 @@ class FoFo_Bec {
             define( 'FOFO_BEC_OPTIONS_KEY', 'FOFO_BEC_OPTIONS_KEY' );
         }
 
-        //Defines for the option keys
-        if( !defined( 'FOFO_BEC_FEATURE_KEY_CATEGORY' ) ) {
-            define( 'FOFO_BEC_FEATURE_KEY_CATEGORY', 'category_panel' );
-        }
-
-        if( !defined( 'FOFO_BEC_FEATURE_KEY_TAG' ) ) {
-            define( 'FOFO_BEC_FEATURE_KEY_TAG', 'tag_panel' );
-        }
-
-        if( !defined( 'FOFO_BEC_FEATURE_KEY_FEAT_IMG' ) ) {
-            define( 'FOFO_BEC_FEATURE_KEY_FEAT_IMG', 'featured_image_panel' );
-        }
-
-        if( !defined( 'FOFO_BEC_FEATURE_KEY_EXCERPT' ) ) {
-            define( 'FOFO_BEC_FEATURE_KEY_EXCERPT', 'excerpt_panel' );
-        }
-
-        if( !defined( 'FOFO_BEC_FEATURE_KEY_DISCUSSION' ) ) {
-            define( 'FOFO_BEC_FEATURE_KEY_DISCUSSION', 'discussion_panel' );
-        }
-     
-        if( !defined( 'FOFO_BEC_FEATURE_KEY_PERMALINK' ) ) {
-            define( 'FOFO_BEC_FEATURE_KEY_PERMALINK', 'permalink_panel' );
+        if( !defined( 'FOFO_BEC_CURRENT_THEME' ) ) {
+            define( 'FOFO_BEC_CURRENT_THEME', 'FOFO_BEC_CURRENT_THEME' );
         }
 
         //Defines for the hooks
@@ -151,17 +154,16 @@ class FoFo_Bec {
             define( 'FOFO_BEC_FEATURE_OFF', 'fofo_bec_feature_off' );
         }
 
-        //Misc Defines
-        if( !defined( 'FOFO_BEC_REQUEST_KEY' ) ) {
-            define( 'FOFO_BEC_REQUEST_KEY', 'fofo_bec' );
+        if( !defined( 'FOFO_BEC_PANEL_ON' ) ) {
+            define( 'FOFO_BEC_PANEL_ON', 'on' );
         }
 
-        if( !defined( 'FOFO_BEC_FEATURE_ON_STATE' ) ) {
-            define( 'FOFO_BEC_FEATURE_ON_STATE', 'on' );
+        if( !defined( 'FOFO_BEC_PANEL_OFF' ) ) {
+            define( 'FOFO_BEC_PANEL_OFF', 'off' );
         }
 
-        if( !defined( 'FOFO_BEC_FEATURE_OFF_STATE' ) ) {
-            define( 'FOFO_BEC_FEATURE_OFF_STATE', 'off' );
+        if( !defined( 'FOFO_BEC_JS_KEY' ) ) {
+            define( 'FOFO_BEC_JS_KEY', 'FOFO_BEC_JS_KEY' );
         }
     }
 
@@ -178,6 +180,7 @@ class FoFo_Bec {
         
         add_action( 'admin_enqueue_scripts', [ $this, 'load_scripts' ] );
         add_action( 'admin_menu', [ $this, 'add_plugin_page' ] );
+        add_action( 'admin_head', [ $this, 'write_js' ] );
     }
 
     /**
@@ -189,37 +192,20 @@ class FoFo_Bec {
      */
     public function load_scripts() {
 
-        $disabled_gutenberg_features = $this->get_disabled_gutenberg_features();
-        wp_register_script( 'fofobec-js', plugin_dir_url( __FILE__ ) . '../js/fofobec.js', null, '1.0.0', true );
+        wp_register_script( 
+            'fofobec-js', 
+            plugin_dir_url( __FILE__ ) . '../js/fofobec.js', 
+            array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor' ), 
+            '1.0.1', 
+            true 
+        );
         wp_localize_script(
             'fofobec-js', 
-            'fofobec', 
-            $disabled_gutenberg_features
+            'fofobec',
+            []
         );
 
         wp_enqueue_script( 'fofobec-js' );
-    }
-
-    /**
-     * Get the block editor featuures that have been turned off
-     * 
-     * @return array {
-     *      @type   string  $feature    The feature which is off(disabled)
-     * }
-     * @since 1.0.0
-     */
-    private function get_disabled_gutenberg_features() {
-
-        $options = get_option( FOFO_BEC_OPTIONS_KEY, $this->option_defaults );
-        $disabled_features = [];
-
-        foreach( $options as $key => $value ) {
-            if( 'off' === $value ) {
-                $disabled_features[] = $key;
-            }
-        }
-
-        return $disabled_features;
     }
 
     /**
@@ -230,8 +216,6 @@ class FoFo_Bec {
      * features will be turned on/off using the hooks only then
      * the FOFO_BEC_SHOW_SETTINGS define can be used to hide the
      * settings page 
-     * 
-     * @see /fof-guten-toggler.php
      * 
      * @return  void
      * @since   1.0.0
@@ -263,92 +247,26 @@ class FoFo_Bec {
      */
     public function show_page() {
 
-        $this->check_for_ui_update();
-        
-        $feature_list = '';
-        $row_set = '';
-        $append = false;
-        foreach( array_keys( $this->option_defaults ) as $feature_key ) {
+        $this->apply_ui_updates();
 
-            $css_id = 'fofo-gutentog-'.$feature_key;
+        $theme_transform = new \FoFoBec\FoFo_Bec_Theme_Transform( $this->current_bec_theme );
+        echo $theme_transform->to_ui();
 
-            $row_set .= '
-                    <th><label for="'.$css_id.'">'.esc_html( $this->get_feature_name( $feature_key ) ).'</label></th>
-                    <td>
-                        <input type="hidden" 
-                        name="'.esc_attr( FOFO_BEC_REQUEST_KEY.'['.$feature_key.']').'" 
-                        value="'.esc_attr( FOFO_BEC_FEATURE_OFF_STATE ).'" />
-
-                        <input id="'.$css_id.'" 
-                        name="'.esc_attr( FOFO_BEC_REQUEST_KEY.'['.$feature_key.']').'" 
-                        type="checkbox" '.esc_attr( $this->get_feature_state( $feature_key ) ).' 
-                        value="'.esc_attr( FOFO_BEC_FEATURE_ON_STATE ).'"/>
-                    </td>
-                ';
-
-            if( $append ) {
-                $feature_list.= '<tr>'.$row_set.'</tr>';
-                $row_set = '';
-                $append = false;
-            } else {
-                $append = true;
-            }
-        }
-
-        if( $append ) {
-            $feature_list.= '<tr>'.$row_set.'</tr>';
-        }
-
-        $page = '
-            <div class="wrap">
-                <h1>Foxdell Folio Block Editor Customiser</h1>
-                <form method="post" action="admin.php?page=fofo_bec_plugin_page" novalidate="novalidate">
-                    '.wp_nonce_field( $this->nonce_key, '_wpnonce', true, false ).'
-                    <table class="form-table" style="width : 75%">
-                        <tbody>
-                            '.$feature_list.'
-                        </tbody>
-                    </table>
-                    <p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes"></p>
-                </form>
-            </div>
-        ';
-
-        $this->current_options = null;
-        echo $page;
     }
 
     /**
-     * Get the feature state
+     * Write the generated javascript into the header
      * 
-     * Helper function called during the buildding of the settings
-     * page to get the feature state
-     * 
-     * @param   string  $feature    The name of the feature as defined in $option_defaults
-     * @return  string  Empty string if the value is off, otherwise 'checked'
-     * @since   1.0.0
+     * @access internal
+     * @return void
+     * @since 1.1.0 
      */
-    private function get_feature_state( $feature ) {
+    public function write_js() {
 
-        if( $this->current_options === null ) {
-            $this->current_options = get_option( FOFO_BEC_OPTIONS_KEY, $this->option_defaults );
-        }
+        $js = get_option( FOFO_BEC_JS_KEY, '' );
+        $js = '<script type="text/javascript">'.$js.'</script>';
 
-        return $this->current_options[ $feature ] === 'on' ? 'checked' : '';
-    }
-
-    /**
-     * Get the featuure display name
-     * 
-     * Helper function to get the ddisplay name of the 
-     * feature. Used during the page buuilding process.
-     * 
-     * @param   string  $feature    The name of the feature as defined in $option_defaults
-     * @return  string  The display name of the feature
-     * @since 1.0.0
-     */
-    private function get_feature_name( $feature ) {
-        return $this->option_feature_names[ $feature ];
+        echo $js;
     }
 
     /**
@@ -395,7 +313,7 @@ class FoFo_Bec {
      */
     public function turn_feature_on( $feature ) {
 
-        $this->toggle_feature( $feature, FOFO_BEC_FEATURE_ON_STATE );
+        $this->toggle_feature( $feature, FOFO_BEC_PANEL_ON );
     } 
 
     /**
@@ -410,7 +328,7 @@ class FoFo_Bec {
      */
     public function turn_feature_off( $feature ) {
 
-        $this->toggle_feature( $feature, FOFO_BEC_FEATURE_OFF_STATE );
+        $this->toggle_feature( $feature, FOFO_BEC_PANEL_OFF );
     } 
 
     /**
@@ -427,77 +345,28 @@ class FoFo_Bec {
      */
     private function toggle_feature( $key, $value ) {
 
-        $updated_options = get_option( FOFO_BEC_OPTIONS_KEY, $this->option_defaults );
-        $updated_options[ $key ] = $value;
-        update_option( FOFO_BEC_OPTIONS_KEY, $updated_options );
+        $this->current_bec_theme->{ $key } = $value;
+        update_option( FOFO_BEC_CURRENT_THEME, $this->current_bec_theme->to_json() );
+
+        $customiser = new \FoFoBec\FoFo_Bec_Customiser( $this->current_bec_theme );
+        $customiser->apply_changes();
+        $customiser->commit_changes();
     }
 
     /**
-     * Check if an option exists
-     * 
-     * Checks to see if one of the default options exists in the database wp_options table
-     * and if it doesn't then add it.
+     * Capture updates from the settings screen
      * 
      * @return  void
      * @since   1.0.0
      */
-    private function check_options_exist() {
-
-        $options = get_option( FOFO_BEC_OPTIONS_KEY, $this->option_defaults );
-        $diff = array_diff_key( $this->option_defaults, $options );
-        $have_diff = count( $diff ) > 0;
-        if( $have_diff ) {
-            foreach( $diff as $feature => $value ) {
-                $options[ $feature ] = $value;
-            }
-
-            update_option( FOFO_BEC_OPTIONS_KEY, $options );
-        }
-    }
-
-    /**
-     * Captre updates from the settings screen
-     * 
-     * @return  void
-     * @since   1.0.0
-     */
-    private function check_for_ui_update() {
+    private function apply_ui_updates() {
        
-        $options = get_option( FOFO_BEC_OPTIONS_KEY, $this->option_defaults );
-        $updates = isset( $_REQUEST[ FOFO_BEC_REQUEST_KEY ] ) ? $_REQUEST[ FOFO_BEC_REQUEST_KEY ] : null;
-        
-        if( $updates !== null ) {
+        $theme_transform = new \FoFoBec\FoFo_Bec_Theme_Transform( $this->current_bec_theme );
+        $this->current_bec_theme = $theme_transform->from_ui( $_REQUEST );
+        update_option( FOFO_BEC_CURRENT_THEME, $this->current_bec_theme->to_json() );
 
-            if( check_admin_referer( $this->nonce_key ) ) {
-                
-                $options = array_merge( $options, $updates );
-                if( $this->options_sanitised( $options ) ) {
-
-                    update_option( FOFO_BEC_OPTIONS_KEY, $options );
-                }
-         
-            }
-        }
-    }
-
-    /**
-     * Sanitise & validate the merged options array, from input
-     * 
-     * @return  boolean True if the arrays are sanitised and are either on or off.
-     * @since   1.o
-     */
-    private function options_sanitised( $options ) {
-
-        $sanitised = true;
-
-        foreach( $options as $key => $value ) {
-
-            $sanitised = $value === FOFO_BEC_FEATURE_ON_STATE || $value === FOFO_BEC_FEATURE_OFF_STATE;
-            if( $sanitised ) {
-                break;
-            }
-        }
-
-        return $sanitised;
+        $customiser = new \FoFoBec\FoFo_Bec_Customiser( $this->current_bec_theme );
+        $customiser->apply_changes();
+        $customiser->commit_changes();
     }
 }
