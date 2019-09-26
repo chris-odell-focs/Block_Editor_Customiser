@@ -6,7 +6,7 @@
 Plugin Name: Foxdell Folio Block Editor Customiser
 Plugin URI: 
 Description: Provide a set of hooks which will allow features gutenberg features to be turned off
-Version: 1.0.0
+Version: 1.1.0
 Author: Foxdell Folio
 Author URI: 
 License: GPLv2 or later
@@ -39,9 +39,35 @@ if( !defined( 'FOFO_BEC_SHOW_SETTINGS' ) ) {
 }
 
 /**
- * Include the class file with core functionality & which calls any library functions
+ * Autoload to load class files & includes
  */
-include_once plugin_dir_path( __FILE__ ).'includes/class-fofo-bec.php';
+spl_autoload_register(function ($class){
+
+	$namspace = 'FoFoBec\\';
+	if( false !== strpos( $class, $namspace ) ) {
+
+		$class = str_replace( $namspace, '', $class );
+		$class_stub = strtolower( str_replace( '_', '-', $class ).'.php' );
+		$_s = DIRECTORY_SEPARATOR;
+
+		$require_types = [ 'class', 'abstract', 'interface' ];
+		$folders = [ 'includes' ];
+
+		foreach( $folders as $folder_stub ) {
+
+			$base_dir = dirname( __FILE__ ).$_s.$folder_stub.$_s;
+
+			foreach( $require_types as $require_type ) {
+
+				if( file_exists( $base_dir.$require_type.'-'.$class_stub ) ) {
+
+					require_once( $base_dir.$require_type.'-'.$class_stub );
+				}
+			}
+		}
+	}
+});
+
 
 /**
  * Bootstrap the pluugin
