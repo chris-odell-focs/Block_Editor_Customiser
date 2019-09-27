@@ -70,7 +70,7 @@ spl_autoload_register(function ($class){
 
 
 /**
- * Bootstrap the pluugin
+ * Bootstrap the plugin
  * 
  * Creates an instance of the core class and initialises the plugin
  * 

@@ -20,7 +20,7 @@ class FoFo_Bec_Theme_Transform {
      * 
      * @var array   {
      *      @type   string      $key        The feature slug/name
-     *      @type   callable    $callable   The function to call to set the valuue on the property
+     *      @type   callable    $callable   The function to call to set the value on the property
      * }
      * 
      * @since   1.1.0

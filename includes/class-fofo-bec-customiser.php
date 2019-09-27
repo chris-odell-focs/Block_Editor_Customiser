@@ -97,7 +97,7 @@ const fofobec_run_dispatcher = function (wp) {
     private $list_delim = '';
 
     /**
-     * Registry of functions which can be called to cuustomise the block editor
+     * Registry of functions which can be called to customise the block editor
      * 
      * @var array {
      *      @type   string  $key

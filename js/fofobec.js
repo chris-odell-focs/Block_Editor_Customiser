@@ -6,5 +6,3 @@
  * @since 1.1.0
  */
 fofobec_run_dispatcher(window.wp);
-
-

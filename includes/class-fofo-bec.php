@@ -185,7 +185,7 @@ class FoFo_Bec {
 
     /**
      * Localise and load the JS script for turning Block Editor
-     * featuures on/off.
+     * features on/off.
      * 
      * @return  void
      * @since   1.0.0
@@ -195,7 +195,7 @@ class FoFo_Bec {
         wp_register_script( 
             'fofobec-js', 
             plugin_dir_url( __FILE__ ) . '../js/fofobec.js', 
-            array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor' ), 
+            null,
             '1.0.1', 
             true 
         );
