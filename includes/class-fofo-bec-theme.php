@@ -47,7 +47,10 @@ class FoFo_Bec_Theme {
             'excerpt_panel' => FOFO_BEC_PANEL_ON,
             'discussion_panel' => FOFO_BEC_PANEL_ON,
             'permalink_panel' => FOFO_BEC_PANEL_ON,
-            'version' => '1.0.0'
+            'name' => '',
+            'display_name' => '',
+            'version' => '1.1.0',
+            'settings_page' => ''
         ];
     }
 

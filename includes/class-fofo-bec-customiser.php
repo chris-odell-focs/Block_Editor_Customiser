@@ -117,6 +117,15 @@ const fofobec_run_dispatcher = function (wp) {
     private $bec_theme;
 
     /**
+     * The data access layer. Used to abstract out options API
+     * 
+     * @var FoFoBec\FoFo_Bec_Dal  $dal
+     * 
+     * @since 1.2.0
+     */
+    private $dal;
+
+    /**
      * Constructor - initialisation
      * 
      * @param   FoFoBec\FoFo_Bec_Theme  $theme  The theme values to set
@@ -124,11 +133,12 @@ const fofobec_run_dispatcher = function (wp) {
      * @return void
      * @since 1.1.0
      */
-    public function __construct( $bec_theme ) {
+    public function __construct( $bec_theme, $dal ) {
 
         $this->create_registry();
 
         $this->bec_theme = $bec_theme;
+        $this->dal = $dal;
     }
 
     /**
@@ -141,12 +151,12 @@ const fofobec_run_dispatcher = function (wp) {
 
         $this->function_registery = [];
         $this->function_registery[ 'default' ] = "default : function() {}";
-        $this->function_registery[ 'category_panel' ] = "'category_panel' : function() { if( removeEditorPanel ) { removeEditorPanel( 'taxonomy-panel-category' ); } }";
-        $this->function_registery[ 'tag_panel' ] = "'tag_panel' : function() { if( removeEditorPanel ) { removeEditorPanel( 'taxonomy-panel-post_tag' ); } }";
-        $this->function_registery[ 'featured_image_panel' ] = "'featured_image_panel' : function() { if( removeEditorPanel ) { removeEditorPanel( 'featured-image' ); } }";
-        $this->function_registery[ 'excerpt_panel' ] = "'excerpt_panel' : function() { if( removeEditorPanel ) { removeEditorPanel( 'post-excerpt' ); } }";
-        $this->function_registery[ 'discussion_panel' ] = "'discussion_panel' : function() { if( removeEditorPanel ) { removeEditorPanel( 'discussion-panel' ); } }";
-        $this->function_registery[ 'permalink_panel' ] = "'permalink_panel' : function() { if( removeEditorPanel ) { removeEditorPanel( 'post-link' ); } }";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'taxonomy-panel-category' ); } }";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_TAG ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_TAG."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'taxonomy-panel-post_tag' ); } }";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'featured-image' ); } }";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'post-excerpt' ); } }";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'discussion-panel' ); } }";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'post-link' ); } }";
     }
 
     /**
@@ -157,12 +167,12 @@ const fofobec_run_dispatcher = function (wp) {
      */
     public function apply_changes() {
 
-        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->category_panel ) { $this->add_js_function( $this->function_registery[ 'category_panel' ] ); }
-        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->tag_panel ) { $this->add_js_function( $this->function_registery[ 'tag_panel' ] ); }
-        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->featured_image_panel ) { $this->add_js_function( $this->function_registery[ 'featured_image_panel' ] ); }
-        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->excerpt_panel ) { $this->add_js_function( $this->function_registery[ 'excerpt_panel' ] ); }
-        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->discussion_panel ) { $this->add_js_function( $this->function_registery[ 'discussion_panel' ] ); }
-        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->permalink_panel ) { $this->add_js_function( $this->function_registery[ 'permalink_panel' ] ); }
+        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->category_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY ] ); }
+        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->tag_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_TAG ] ); }
+        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->featured_image_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE ] ); }
+        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->excerpt_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT ] ); }
+        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->discussion_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION ] ); }
+        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->permalink_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK ] ); }
     }
 
     /**
@@ -178,7 +188,7 @@ const fofobec_run_dispatcher = function (wp) {
     public function commit_changes() {
 
         $js = str_replace( '{[function_list]}', $this->function_list, $this->js_template );
-        update_option( FOFO_BEC_JS_KEY, $js );
+        $this->dal->set_generated_js( $js );
     }
 
     /**
@@ -192,7 +202,12 @@ const fofobec_run_dispatcher = function (wp) {
      */
     public function get_javascript() {
 
-        return get_option( FOFO_BEC_JS_KEY, str_replace( '{[function_list]}', $this->function_registery[ 'default' ], $this->js_template ) );
+        $js = $this->dal->get_generated_js();
+        if( '' === $js ) {
+            $js = str_replace( '{[function_list]}', $this->function_registery[ 'default' ], $this->js_template );
+        }
+
+        return $js;
     }
 
     /**

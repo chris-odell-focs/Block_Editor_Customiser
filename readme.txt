@@ -58,6 +58,14 @@ It can also be installed manually.
 
 == Changelog ==
 
+= 1.2.0 =
+* Refactored code for better decoupling.
+* Added the theme selector to the settings page.
+* Created a default theme.
+
+= 1.1.0 =
+* Added code to allow the management of customisation options as a theme.
+
 = 1.0 =
 * First commit
 

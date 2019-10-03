@@ -63,15 +63,6 @@ class FoFo_Bec {
     private $current_options = null;
 
     /**
-     * The nonce key to use when rendering the form fo the settings page
-     * 
-     * @var string  $nonce_key
-     * 
-     * @since 1.0.0
-     */
-    private $nonce_key = '';
-
-    /**
      * The current Bloc Editor Customiser theme
      * 
      * @var FoFoBec\FoFo_Bec_Theme  $current_bec_theme
@@ -81,6 +72,22 @@ class FoFo_Bec {
     private $current_bec_theme;
 
     /**
+     * The data access layer. Used to abstract out options API
+     * 
+     * @var FoFoBec\FoFo_Bec_Dal  $dal
+     * 
+     * @since 1.2.0
+     */
+    private $dal;
+
+    /**
+     * The theme registry
+     * 
+     * @var     FoFo_Bec_Theme_Registry     $theme_registry
+     */
+    private $theme_registry;
+
+    /**
      * Initialise the plugin
      * 
      * @return  void
@@ -88,18 +95,26 @@ class FoFo_Bec {
      */
     public function attach() {
 
-        $this->do_defines();
+        \FoFoBec\FoFo_Bec_Shared::set_defines();
+
         $this->do_wp_hooks();
         $this->do_our_hooks();
 
-        $options = get_option( FOFO_BEC_OPTIONS_KEY, '' );
+        $this->dal = new \FoFoBec\FoFo_Bec_Dal();
+        $this->theme_registry = new \FoFoBec\FoFo_Bec_Theme_Registry( $this->dal );
+
+        $options = $this->dal->get_v1_options();
         if( '' !== $options ) {
             $this->convert_to_theme( $options );
         }
 
-        $serialised_theme = get_option( FOFO_BEC_CURRENT_THEME, '' );
+        $serialised_theme = $this->dal->get_current_theme();
+
         $this->current_bec_theme = new \FoFoBec\FoFo_Bec_Theme();
         $this->current_bec_theme->from_json( $serialised_theme );
+
+        $this->current_bec_theme = \FoFoBec\FoFo_Bec_Upgrader::theme_v100_v110( $this->current_bec_theme );
+        $this->theme_registry->scan_for_themes();
     }
 
     /**
@@ -125,46 +140,8 @@ class FoFo_Bec {
         $converted_theme->permalink_panel = $options[ 'permalink_panel' ];
 
         //update the options
-        update_option( FOFO_BEC_CURRENT_THEME, $converted_theme->to_json() );
-        update_option( FOFO_BEC_OPTIONS_KEY, '' );
-    }
-
-    /**
-     * Define constants for use throghout the class
-     * 
-     * @return  void
-     * @since   1.0.0
-     */
-    private function do_defines() {
-
-        if( !defined( 'FOFO_BEC_OPTIONS_KEY' ) ) {
-            define( 'FOFO_BEC_OPTIONS_KEY', 'FOFO_BEC_OPTIONS_KEY' );
-        }
-
-        if( !defined( 'FOFO_BEC_CURRENT_THEME' ) ) {
-            define( 'FOFO_BEC_CURRENT_THEME', 'FOFO_BEC_CURRENT_THEME' );
-        }
-
-        //Defines for the hooks
-        if( !defined( 'FOFO_BEC_FEATURE_ON' ) ) {
-            define( 'FOFO_BEC_FEATURE_ON', 'fofo_bec_feature_on' );
-        }
-
-        if( !defined( 'FOFO_BEC_FEATURE_OFF' ) ) {
-            define( 'FOFO_BEC_FEATURE_OFF', 'fofo_bec_feature_off' );
-        }
-
-        if( !defined( 'FOFO_BEC_PANEL_ON' ) ) {
-            define( 'FOFO_BEC_PANEL_ON', 'on' );
-        }
-
-        if( !defined( 'FOFO_BEC_PANEL_OFF' ) ) {
-            define( 'FOFO_BEC_PANEL_OFF', 'off' );
-        }
-
-        if( !defined( 'FOFO_BEC_JS_KEY' ) ) {
-            define( 'FOFO_BEC_JS_KEY', 'FOFO_BEC_JS_KEY' );
-        }
+        $this->dal->set_current_theme( $converted_theme );
+        $this->dal->set_v1_options( '' );
     }
 
     /**
@@ -249,9 +226,13 @@ class FoFo_Bec {
 
         $this->apply_ui_updates();
 
+        $page_builder = new \FoFoBec\FoFo_Bec_Page_Builder( $this->current_bec_theme );
         $theme_transform = new \FoFoBec\FoFo_Bec_Theme_Transform( $this->current_bec_theme );
-        echo $theme_transform->to_ui();
+        $theme_settings = $theme_transform->to_ui( $page_builder );
 
+        $composer = new \FoFoBec\FoFo_Bec_Page_Composer( $this->dal, $this->theme_registry );
+
+        echo $composer->build_page( $theme_settings );
     }
 
     /**
@@ -263,7 +244,7 @@ class FoFo_Bec {
      */
     public function write_js() {
 
-        $js = get_option( FOFO_BEC_JS_KEY, '' );
+        $js = $this->dal->get_generated_js();
         $js = '<script type="text/javascript">'.$js.'</script>';
 
         echo $js;
@@ -345,10 +326,10 @@ class FoFo_Bec {
      */
     private function toggle_feature( $key, $value ) {
 
-        $this->current_bec_theme->{ $key } = $value;
-        update_option( FOFO_BEC_CURRENT_THEME, $this->current_bec_theme->to_json() );
+        $this->current_bec_theme->{ $key } = $value;        
+        $this->dal->set_current_theme( $this->current_bec_theme );
 
-        $customiser = new \FoFoBec\FoFo_Bec_Customiser( $this->current_bec_theme );
+        $customiser = new \FoFoBec\FoFo_Bec_Customiser( $this->current_bec_theme, $this->dal );
         $customiser->apply_changes();
         $customiser->commit_changes();
     }
@@ -361,11 +342,14 @@ class FoFo_Bec {
      */
     private function apply_ui_updates() {
        
-        $theme_transform = new \FoFoBec\FoFo_Bec_Theme_Transform( $this->current_bec_theme );
+        $theme_transform = new \FoFoBec\FoFo_Bec_Theme_Transform( $this->current_bec_theme);
         $this->current_bec_theme = $theme_transform->from_ui( $_REQUEST );
-        update_option( FOFO_BEC_CURRENT_THEME, $this->current_bec_theme->to_json() );
+        $this->dal->set_current_theme( $this->current_bec_theme );
 
-        $customiser = new \FoFoBec\FoFo_Bec_Customiser( $this->current_bec_theme );
+        $composer = new \FoFoBec\FoFo_Bec_Page_Composer( $this->dal, $this->theme_registry );
+        $composer->apply_ui_updates( $_REQUEST );
+
+        $customiser = new \FoFoBec\FoFo_Bec_Customiser( $this->current_bec_theme, $this->dal );
         $customiser->apply_changes();
         $customiser->commit_changes();
     }
