@@ -20,63 +20,17 @@ class FoFo_Bec_Customiser {
      * @since 1.1.0
      */
     private $js_template = '
-/**
- * Get the removeEditorPanel if it is available
- * 
- * @return  function/null   The removeEdditorPanel function from dispatch or null if not available
- * @since 1.1.0
- */
-const fofobec_get_removeEditorPanel = (dispatch) => {  
 
-    if( undefined !== dispatch( "core/edit-post" ) ) {
-        const { removeEditorPanel } = dispatch( "core/edit-post" );
-        return removeEditorPanel;
-    }
+const fofobec_function_dispatcher = ( wpStore )  => {
 
-    return null; 
-};
-
-/**
- * Abstract the Block editor functions to call
- * 
- * This abstracts the block editor functions to call to enable/disable features
- * using a strategy pattern approach. aka higher order component.
- * 
- * @return  array {
- *      @type   string      $key        The feature to turn on/off
- *      @type   function    $function   The function which calls the Block editor API to disable a Block edditor element
- * }
- * @since   1.0.0
- */
-const fofobec_function_dispatcher = (dispatch)  => {
-
-    const removeEditorPanel = fofobec_get_removeEditorPanel(dispatch);
+    const store = fofobecCoreEditPostStore(wpStore.select, wpStore.dispatch);
+    const doRemovePanel = store.doRemovePanel;
+    const doToggleFeature = store.doToggleFeature;
+    const removeElement = fofo_bec_dom(jQuery).removeElement;
 
     return {
         {[function_list]}
     };
-};
-
-/**
- * IIFE to loop through the list of disable features
- * 
- * This function is passed the global wp javascript variable
- * to have access to the Block editor functions and then loops
- * through the disabled features expressed in the fofogutentog
- * variable defined as part of the script localisastion.
- * 
- * @param   object  wp  Gloabl WordPress object
- * @since   1.0.0
- */
-const fofobec_run_dispatcher = function (wp) {
-
-    if(wp.data !== null && wp.data !== undefined) {
-
-        let dispatcher = fofobec_function_dispatcher(wp.data.dispatch);
-        for(key in dispatcher) {
-            dispatcher[ key ]();
-        }
-    }
 };
     ';
 
@@ -151,12 +105,16 @@ const fofobec_run_dispatcher = function (wp) {
 
         $this->function_registery = [];
         $this->function_registery[ 'default' ] = "default : function() {}";
-        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'taxonomy-panel-category' ); } }";
-        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_TAG ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_TAG."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'taxonomy-panel-post_tag' ); } }";
-        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'featured-image' ); } }";
-        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'post-excerpt' ); } }";
-        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'discussion-panel' ); } }";
-        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK."' : function() { if( removeEditorPanel ) { removeEditorPanel( 'post-link' ); } }";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY."' : () => doRemovePanel( 'taxonomy-panel-category' )";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_TAG ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_TAG."' : () => doRemovePanel( 'taxonomy-panel-post_tag' )";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE."' : () => doRemovePanel( 'featured-image' )";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT."' : () => doRemovePanel( 'post-excerpt' )";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION."' : () => doRemovePanel( 'discussion-panel' )";
+        $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_PERMALINK ] = "'".FOFO_BEC_FEATURE_DOC_PANEL_PERMALINK."' : () => doRemovePanel( 'post-link' )";
+        $this->function_registery[ FOFO_BEC_FEATURE_TOP_TOOLBAR ] = "'".FOFO_BEC_FEATURE_TOP_TOOLBAR."' : () => doToggleFeature( 'fixedToolbar', '[{state}]' )";
+        $this->function_registery[ FOFO_BEC_FEATURE_SPOTLIGHT_MODE ] = "'".FOFO_BEC_FEATURE_SPOTLIGHT_MODE."' : () => doToggleFeature( 'focusMode', '[{state}]' )";
+        $this->function_registery[ FOFO_BEC_FEATURE_FULLSCREEN ] = "'".FOFO_BEC_FEATURE_FULLSCREEN."' : () => doToggleFeature( 'fullscreenMode', '[{state}]' )";
+        $this->function_registery[ FOFO_BEC_FEATURE_MORE_OPTIONS_MENU ] = "'".FOFO_BEC_FEATURE_MORE_OPTIONS_MENU."' : () => removeElement( '.edit-post-more-menu' )";
     }
 
     /**
@@ -172,8 +130,13 @@ const fofobec_run_dispatcher = function (wp) {
         if( FOFO_BEC_PANEL_OFF === $this->bec_theme->featured_image_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE ] ); }
         if( FOFO_BEC_PANEL_OFF === $this->bec_theme->excerpt_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT ] ); }
         if( FOFO_BEC_PANEL_OFF === $this->bec_theme->discussion_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION ] ); }
-        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->permalink_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK ] ); }
-    }
+        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->permalink_panel ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_DOC_PANEL_PERMALINK ] ); }
+
+        $this->add_js_function( str_replace( '[{state}]', strtolower( $this->bec_theme->top_toolbar ), $this->function_registery[ FOFO_BEC_FEATURE_TOP_TOOLBAR ] ) );
+        $this->add_js_function( str_replace( '[{state}]', strtolower( $this->bec_theme->spotlight_mode ), $this->function_registery[ FOFO_BEC_FEATURE_SPOTLIGHT_MODE ] ) );
+        $this->add_js_function( str_replace( '[{state}]', strtolower( $this->bec_theme->fullscreen ), $this->function_registery[ FOFO_BEC_FEATURE_FULLSCREEN ] ) );
+        
+        if( FOFO_BEC_PANEL_OFF === $this->bec_theme->edit_post_more_menu ) { $this->add_js_function( $this->function_registery[ FOFO_BEC_FEATURE_MORE_OPTIONS_MENU ] ); }    }
 
     /**
      * Commit the changes after applying the changes from a theme

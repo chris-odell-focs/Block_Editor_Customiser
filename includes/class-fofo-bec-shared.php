@@ -47,6 +47,10 @@ class FoFo_Bec_Shared {
             define( 'FOFO_BEC_THEME_REPO_DIR', dirname( __FILE__ ).'/../themes' );
         }
 
+        if( !defined( 'FOFO_BEC_THEME_REPO_URL' ) ) {
+            define( 'FOFO_BEC_THEME_REPO_URL', str_replace( 'includes', 'themes', plugin_dir_url( __FILE__ ) ) );
+        }
+
         if( !defined( 'FOFO_BEC_REQUEST_KEY' ) ) {
             define( 'FOFO_BEC_REQUEST_KEY', 'fofo_bec' );
         }
@@ -128,8 +132,24 @@ class FoFo_Bec_Shared {
             define( 'FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION', 'discussion_panel' );
         }
 
-        if( !defined( 'FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK' ) ) {
-            define( 'FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK', 'permalink_panel' );
+        if( !defined( 'FOFO_BEC_FEATURE_DOC_PANEL_PERMALINK' ) ) {
+            define( 'FOFO_BEC_FEATURE_DOC_PANEL_PERMALINK', 'permalink_panel' );
+        }
+
+        if( !defined( 'FOFO_BEC_FEATURE_TOP_TOOLBAR' ) ) {
+            define( 'FOFO_BEC_FEATURE_TOP_TOOLBAR', 'top_toolbar' );
+        }
+
+        if( !defined( 'FOFO_BEC_FEATURE_SPOTLIGHT_MODE' ) ) {
+            define( 'FOFO_BEC_FEATURE_SPOTLIGHT_MODE', 'spotlight_mode' );
+        }
+
+        if( !defined( 'FOFO_BEC_FEATURE_FULLSCREEN' ) ) {
+            define( 'FOFO_BEC_FEATURE_FULLSCREEN', 'fullscreen' );
+        }
+
+        if( !defined( 'FOFO_BEC_FEATURE_MORE_OPTIONS_MENU' ) ) {
+            define( 'FOFO_BEC_FEATURE_MORE_OPTIONS_MENU', 'edit_post_more_menu' );
         }
     }
 }

@@ -30,7 +30,7 @@ class FoFo_Bec_Dal {
     }
 
     /**
-     * Set the versin 1 options
+     * Set the version 1 options
      * 
      * @param   mixed   Any value that the Options API update_option will take
      * 
@@ -43,14 +43,20 @@ class FoFo_Bec_Dal {
     }
 
     /**
-     * Get the current theme in it's serialised form
+     * Get the current theme. If a theme isn't found, default to the default theme.
      * 
-     * @return  string  String-ified theme object
+     * @return  string  FoFoBec\FoFo_Bec_Theme
      * @since 1.2.0
      */
     public function get_current_theme() {
 
-        return get_option( FOFO_BEC_CURRENT_THEME, '' );
+        $theme = new \FoFoBec\FoFo_Bec_Theme();
+        $theme->name = 'default';
+        $theme->display_name = 'Default';
+        $theme->settings_page = 'settings';
+        $theme->css = '';
+
+        return get_option( FOFO_BEC_CURRENT_THEME, $theme );
     }
 
     /**
@@ -63,7 +69,7 @@ class FoFo_Bec_Dal {
      */
     public function set_current_theme( $theme ) {
 
-        update_option( FOFO_BEC_CURRENT_THEME, $theme->to_json() );
+        update_option( FOFO_BEC_CURRENT_THEME, $theme );
     }
 
     /**
@@ -90,30 +96,6 @@ class FoFo_Bec_Dal {
     public function set_generated_js( $js ) {
 
         update_option( FOFO_BEC_JS_KEY, $js );
-    }
-
-    /**
-     * Get the theme name which has been selected in the front end
-     * 
-     * @return  string  The theme name
-     * @since 1.2.0
-     */
-    public function get_selected_theme_name() {
-
-        return get_option( 'FOFO_BEC_'.FOFO_BEC_SELECTED_THEME_NAME, 'default' );
-    }
-
-    /**
-     * Set the theme name selected in the front end
-     * 
-     * @param   string  $theme_name The theme name
-     * 
-     * @return  void
-     * @since 1.2.0
-     */
-    public function set_selected_theme_name( $theme_name ) {
-
-        update_option( 'FOFO_BEC_'.FOFO_BEC_SELECTED_THEME_NAME, $theme_name );
     }
 
     /**

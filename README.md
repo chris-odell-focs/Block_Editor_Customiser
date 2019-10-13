@@ -10,6 +10,10 @@ Quick links: [Using](#using) | [Installing](#installing) | [Donating](#donating)
 After the plugin has been installed features of the Block Editor can be turned off and on using the settings page
 or the two hooks provided which can be called with do_action.
 
+The plugin also allows customisation of the look and feel of the Block Editor through the selection of themes. Themes bundled with the
+plugin are the Default theme, which has the same look and feel as the base Block Editor, and the VS Light theme which emulates the Light theme 
+in VS Code.
+
 The two hooks are:-
 
 'fofo_bec_feature_on' to turn features on and
@@ -23,6 +27,10 @@ Currently supported features are :-
  *  The 'Excerpt Panel' on the settings sidebar [use feature name 'excerpt_panel']
  *  The 'Discussion Panel' on the settings sidebar [use feature name 'discussion_panel']
  *  The 'Permalink Panel' on the settings sidebar [use feature name 'permalink_panel']
+ *  The 'Top Toolbar' option can be toggled on/off [use feature name 'top_toolbar']
+ *  The 'Spotlight Mode' can be toggled on/off [use feature name 'spotlight_mode']
+ *  The 'Fullscreen mode' can be toggled on/off  [use feature name 'fullscreen']
+ *  The 'Show more tools and options' button can be turned off [use feature name 'edit_post_more_menu']
  
 ### Examples
 

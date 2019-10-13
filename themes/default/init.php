@@ -6,6 +6,7 @@ function register_bec_default_theme( $fofo_bec_register ) {
     $theme->name = 'default';
     $theme->display_name = 'Default';
     $theme->settings_page = 'settings';
+    $theme->css = '';
 
     $fofo_bec_register->register_theme( $theme );
 

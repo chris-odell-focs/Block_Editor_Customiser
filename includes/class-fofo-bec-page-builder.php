@@ -53,12 +53,16 @@ class FoFo_Bec_Page_Builder {
     private function build_html_registry() {
 
         $this->html_registry =[
-            FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY => function( $args ){ return $this->get_document_panel_html( FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY, $args ); },
-            FOFO_BEC_FEATURE_DOC_PANEL_TAG => function( $args ){ return $this->get_document_panel_html( FOFO_BEC_FEATURE_DOC_PANEL_TAG, $args ); },
-            FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE => function( $args ){ return $this->get_document_panel_html( FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE, $args ); },
-            FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT => function( $args ){ return $this->get_document_panel_html( FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT, $args ); },
-            FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION => function( $args ){ return $this->get_document_panel_html( FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION, $args ); },
-            FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK => function( $args ){ return $this->get_document_panel_html( FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK, $args ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY => function( $args ){ return $this->get_toggle_value_html( FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY, $args ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_TAG => function( $args ){ return $this->get_toggle_value_html( FOFO_BEC_FEATURE_DOC_PANEL_TAG, $args ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE => function( $args ){ return $this->get_toggle_value_html( FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE, $args ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT => function( $args ){ return $this->get_toggle_value_html( FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT, $args ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION => function( $args ){ return $this->get_toggle_value_html( FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION, $args ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_PERMALINK => function( $args ){ return $this->get_toggle_value_html( FOFO_BEC_FEATURE_DOC_PANEL_PERMALINK, $args ); },
+            FOFO_BEC_FEATURE_TOP_TOOLBAR => function( $args ){ return $this->get_toggle_value_html( FOFO_BEC_FEATURE_TOP_TOOLBAR, $args ); },
+            FOFO_BEC_FEATURE_SPOTLIGHT_MODE => function( $args ){ return $this->get_toggle_value_html( FOFO_BEC_FEATURE_SPOTLIGHT_MODE, $args ); },
+            FOFO_BEC_FEATURE_FULLSCREEN => function( $args ){ return $this->get_toggle_value_html( FOFO_BEC_FEATURE_FULLSCREEN, $args ); },
+            FOFO_BEC_FEATURE_MORE_OPTIONS_MENU => function( $args ){ return $this->get_toggle_value_html( FOFO_BEC_FEATURE_MORE_OPTIONS_MENU, $args ); },
         ];
     }
 
@@ -90,7 +94,7 @@ class FoFo_Bec_Page_Builder {
      * @return  string  The html to output
      * @since 1.2.0
      */
-    private function get_document_panel_html( $panel_name, $args ) {
+    private function get_toggle_value_html( $panel_name, $args ) {
 
         $wrap = $args[ 'wrap' ];
         $css_id = $args[ 'css_id' ];
