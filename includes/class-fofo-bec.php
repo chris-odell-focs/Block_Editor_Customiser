@@ -359,12 +359,14 @@ class FoFo_Bec {
      */
     private function apply_ui_updates() {
        
-        $theme_transform = new \FoFoBec\FoFo_Bec_Theme_Transform( $this->current_bec_theme);
-        $this->current_bec_theme = $theme_transform->from_ui( $_REQUEST );
-        $this->theme_registry->set_current_theme( $this->current_bec_theme );
-
         $composer = new \FoFoBec\FoFo_Bec_Page_Composer( $this->dal, $this->theme_registry );
         $composer->apply_ui_updates( $_REQUEST );
+        $this->current_bec_theme = $this->theme_registry->get_current_theme();
+
+        $theme_transform = new \FoFoBec\FoFo_Bec_Theme_Transform( $this->current_bec_theme );
+
+        $this->current_bec_theme = $theme_transform->from_ui( $_REQUEST );
+        $this->theme_registry->set_current_theme( $this->current_bec_theme );
 
         $customiser = new \FoFoBec\FoFo_Bec_Customiser( $this->current_bec_theme, $this->dal );
         $customiser->apply_changes();

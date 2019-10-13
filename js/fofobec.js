@@ -2,8 +2,21 @@
 //todo-look into using compose
 const fofobecCoreEditPostStore = function(select, dispatch) {
 
-    const ceDispatch = dispatch !== undefined ? dispatch( "core/edit-post" ) : null;
-    const ceSelect = select !== undefined ? select( "core/edit-post" ) : null;
+    const getStoreFunction = function(resolver) {
+
+        if(resolver !== undefined) {
+
+            const storeFunction = resolver( "core/edit-post" );
+            if( storeFunction !== undefined ) {
+                return storeFunction;
+            }
+        }
+
+        return null;
+    };
+
+    const ceDispatch = getStoreFunction(dispatch);
+    const ceSelect = getStoreFunction(select);
 
     const wpRemoveEditorPanel = function( panelName ) {
 
