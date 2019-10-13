@@ -47,10 +47,15 @@ class FoFo_Bec_Theme {
             'excerpt_panel' => FOFO_BEC_PANEL_ON,
             'discussion_panel' => FOFO_BEC_PANEL_ON,
             'permalink_panel' => FOFO_BEC_PANEL_ON,
+            'top_toolbar' => FOFO_BEC_PANEL_OFF,
+            'spotlight_mode' => FOFO_BEC_PANEL_OFF,
+            'fullscreen' => FOFO_BEC_PANEL_OFF,
+            'edit_post_more_menu' => FOFO_BEC_PANEL_ON,
             'name' => '',
             'display_name' => '',
-            'version' => '1.1.0',
-            'settings_page' => ''
+            'version' => '1.2.0',
+            'settings_page' => '',
+            'css' => ''
         ];
     }
 

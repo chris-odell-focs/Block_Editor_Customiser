@@ -72,7 +72,7 @@ class FoFo_Bec_Page_Composer {
     private function build_update_functions() {
 
         $this->update_functions = [
-            FOFO_BEC_SELECTED_THEME_NAME => function( $value ){ $this->set_current_theme_name( $value  ); },
+            FOFO_BEC_SELECTED_THEME_NAME => function( $theme_name ){ $this->set_current_theme( $theme_name ); },
         ];
     }
 
@@ -126,7 +126,6 @@ class FoFo_Bec_Page_Composer {
                 }  
             }
         }
-
     }
 
     /**
@@ -137,12 +136,20 @@ class FoFo_Bec_Page_Composer {
      */
     private function get_theme_selector() {
 
+        $registered_themes = $this->dal->get_registered_themes();
         $page = '
-            <select name="'.esc_attr( FOFO_BEC_REQUEST_KEY.'['.FOFO_BEC_SELECTED_THEME_NAME.']').'">
-                <option selected value="'.esc_attr( 'default' ).'">Default</option>
-            </select>
-        ';
+            <label>Selected Theme</label>
+            <select name="'.esc_attr( FOFO_BEC_REQUEST_KEY.'['.FOFO_BEC_SELECTED_THEME_NAME.']').'">';
 
+        $current_theme = $this->dal->get_current_theme();
+        
+        foreach( $registered_themes as $key => $theme ) {
+
+            $selected = $current_theme->name === $theme->name ? 'selected' : '' ;
+            $page .= '<option '.$selected.' value="'.esc_attr( $theme->name ).'">'.$theme->display_name.'</option>';
+        }
+
+        $page .= '</select>';
         return $page;
     }
 
@@ -154,10 +161,12 @@ class FoFo_Bec_Page_Composer {
      * @return  void
      * @since 1.2.0
      */
-    private function set_current_theme_name( $value ) {
+    private function set_current_theme( $theme_name ) {
 
-        if( $this->theme_registry->theme_exists( $value ) ) {
-            $this->dal->set_selected_theme_name( $value );
+        if( $this->theme_registry->theme_exists( $theme_name ) ) {
+
+            $selected_theme = $this->theme_registry->get_theme( $theme_name );
+            $this->theme_registry->set_current_theme( $selected_theme );
         }
     }
 }

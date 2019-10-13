@@ -52,12 +52,16 @@ class FoFo_Bec_Theme_Transform {
         $this->bec_theme = $bec_theme;
 
         $this->update_functions = [
-            FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY => function( $value ){ $this->set_panel_state( FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY, $value  ); },
-            FOFO_BEC_FEATURE_DOC_PANEL_TAG => function( $value ){ $this->set_panel_state( FOFO_BEC_FEATURE_DOC_PANEL_TAG, $value  ); },
-            FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE => function( $value ){ $this->set_panel_state( FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE, $value  ); },
-            FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT => function( $value ){ $this->set_panel_state( FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT, $value  ); },
-            FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION => function( $value ){ $this->set_panel_state( FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION, $value  ); },
-            FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK => function( $value ){ $this->set_panel_state( FOFO_BEC_FEATURE_DOC_PANEL_PEMALINK, $value  ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY => function( $value ){ $this->set_feature_state( FOFO_BEC_FEATURE_DOC_PANEL_CATEGORY, $value  ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_TAG => function( $value ){ $this->set_feature_state( FOFO_BEC_FEATURE_DOC_PANEL_TAG, $value  ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE => function( $value ){ $this->set_feature_state( FOFO_BEC_FEATURE_DOC_PANEL_FEATURED_IMAGE, $value  ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT => function( $value ){ $this->set_feature_state( FOFO_BEC_FEATURE_DOC_PANEL_EXCERPT, $value  ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION => function( $value ){ $this->set_feature_state( FOFO_BEC_FEATURE_DOC_PANEL_DISCUSSION, $value  ); },
+            FOFO_BEC_FEATURE_DOC_PANEL_PERMALINK => function( $value ){ $this->set_feature_state( FOFO_BEC_FEATURE_DOC_PANEL_PERMALINK, $value  ); },
+            FOFO_BEC_FEATURE_TOP_TOOLBAR => function( $value ){ $this->set_feature_state( FOFO_BEC_FEATURE_TOP_TOOLBAR, $value  ); },
+            FOFO_BEC_FEATURE_SPOTLIGHT_MODE => function( $value ){ $this->set_feature_state( FOFO_BEC_FEATURE_SPOTLIGHT_MODE, $value  ); },
+            FOFO_BEC_FEATURE_FULLSCREEN => function( $value ){ $this->set_feature_state( FOFO_BEC_FEATURE_FULLSCREEN, $value  ); },
+            FOFO_BEC_FEATURE_MORE_OPTIONS_MENU => function( $value ){ $this->set_feature_state( FOFO_BEC_FEATURE_MORE_OPTIONS_MENU, $value  ); },
         ];
     }
 
@@ -90,19 +94,19 @@ class FoFo_Bec_Theme_Transform {
     }
 
     /**
-     * Set the panel state with values updated from the settings panel
+     * Set the featuure state with values updated from the settings panel
      * also provides sanitisation/validation of the data.
      * 
-     * @param   string  $panel_name The name of the panel to change the state of
+     * @param   string  $feature    The name of the panel to change the state of
      * @param   string  $state      Either on or off
      * 
      * @return void
      * @since 1.1.0
      */
-    private function set_panel_state( $panel_name, $state ) {
+    private function set_feature_state( $feature, $state ) {
 
         $panel_state = $state === FOFO_BEC_PANEL_ON ? FOFO_BEC_PANEL_ON : FOFO_BEC_PANEL_OFF;
-        $this->bec_theme->{$panel_name} = $panel_state;
+        $this->bec_theme->{$feature} = $panel_state;
     }
 
     /**
@@ -116,6 +120,7 @@ class FoFo_Bec_Theme_Transform {
 
         extract( [ 'page_builder' => $page_builder ] );
         ob_start();	
+        
         include_once FOFO_BEC_THEME_REPO_DIR.'/'.$this->bec_theme->name.'/'.$this->bec_theme->settings_page.'.php';
         
         return ob_get_clean();        

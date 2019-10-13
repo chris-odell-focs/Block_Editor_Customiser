@@ -6,7 +6,7 @@
 Plugin Name: Foxdell Folio Block Editor Customiser
 Plugin URI: 
 Description: Provide a set of hooks which will allow features gutenberg features to be turned off
-Version: 1.2.0
+Version: 1.3.0
 Author: Foxdell Folio
 Author URI: 
 License: GPLv2 or later

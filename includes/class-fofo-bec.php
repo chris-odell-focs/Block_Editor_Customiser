@@ -108,12 +108,9 @@ class FoFo_Bec {
             $this->convert_to_theme( $options );
         }
 
-        $serialised_theme = $this->dal->get_current_theme();
-
-        $this->current_bec_theme = new \FoFoBec\FoFo_Bec_Theme();
-        $this->current_bec_theme->from_json( $serialised_theme );
-
+        $this->current_bec_theme = $this->theme_registry->get_current_theme();
         $this->current_bec_theme = \FoFoBec\FoFo_Bec_Upgrader::theme_v100_v110( $this->current_bec_theme );
+        $this->current_bec_theme = \FoFoBec\FoFo_Bec_Upgrader::theme_v110_v120( $this->current_bec_theme );
         $this->theme_registry->scan_for_themes();
     }
 
@@ -140,7 +137,7 @@ class FoFo_Bec {
         $converted_theme->permalink_panel = $options[ 'permalink_panel' ];
 
         //update the options
-        $this->dal->set_current_theme( $converted_theme );
+        $this->theme_registry->set_current_theme( $converted_theme );
         $this->dal->set_v1_options( '' );
     }
 
@@ -172,8 +169,8 @@ class FoFo_Bec {
         wp_register_script( 
             'fofobec-js', 
             plugin_dir_url( __FILE__ ) . '../js/fofobec.js', 
-            null,
-            '1.0.1', 
+            ['jquery', 'wp-editor'],
+            '1.0.2', 
             true 
         );
         wp_localize_script(
@@ -183,6 +180,26 @@ class FoFo_Bec {
         );
 
         wp_enqueue_script( 'fofobec-js' );
+
+        $dal = new \FoFoBec\FoFo_Bec_Dal();
+        $theme_registry = new \FoFoBec\FoFo_Bec_Theme_Registry( $dal );
+
+        $bec_theme = $theme_registry->get_current_theme();
+        if( function_exists( 'get_current_screen' ) ) {
+
+            $current_screen = get_current_screen();
+            if( 'post' === $current_screen->id ) {
+
+                if( '' !== $bec_theme->css ) {
+
+                    $theme_style_slug = 'fofobec-themcss-'.$bec_theme->name;
+                    $theme_css_url = FOFO_BEC_THEME_REPO_URL.$bec_theme->name.'/'.$bec_theme->css.'.css';
+
+                    wp_register_style( $theme_style_slug, $theme_css_url, false, '1.0.0' );
+                    wp_enqueue_style( $theme_style_slug );
+                }
+            }
+        }
     }
 
     /**
@@ -327,7 +344,7 @@ class FoFo_Bec {
     private function toggle_feature( $key, $value ) {
 
         $this->current_bec_theme->{ $key } = $value;        
-        $this->dal->set_current_theme( $this->current_bec_theme );
+        $this->theme_registry->set_current_theme( $this->current_bec_theme );
 
         $customiser = new \FoFoBec\FoFo_Bec_Customiser( $this->current_bec_theme, $this->dal );
         $customiser->apply_changes();
@@ -344,7 +361,7 @@ class FoFo_Bec {
        
         $theme_transform = new \FoFoBec\FoFo_Bec_Theme_Transform( $this->current_bec_theme);
         $this->current_bec_theme = $theme_transform->from_ui( $_REQUEST );
-        $this->dal->set_current_theme( $this->current_bec_theme );
+        $this->theme_registry->set_current_theme( $this->current_bec_theme );
 
         $composer = new \FoFoBec\FoFo_Bec_Page_Composer( $this->dal, $this->theme_registry );
         $composer->apply_ui_updates( $_REQUEST );
