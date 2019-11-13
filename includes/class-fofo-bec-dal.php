@@ -125,4 +125,33 @@ class FoFo_Bec_Dal {
 
         return get_option( FOFO_BEC_THEME_REGISTER, [] );
     }
+
+    /**
+     * Get any addons which have been successfully activated
+     * 
+     * @return  array {
+     *      @type   \FoFoBec\FoFo_Bec_Addon
+     * }
+     * 
+     * @since 1.4.0
+     */
+    public function get_addons() {
+
+        return get_option( FOFO_BEC_ADDON_REGISTER, [] );
+    }
+
+    /**
+     * Set activated addons
+     * 
+     * @param  array {
+     *      @type   \FoFoBec\FoFo_Bec_Addon
+     * }
+     * 
+     * @return      void
+     * @since       1.4.0
+     */
+    public function set_addons( $addons ) {
+
+        update_option( FOFO_BEC_ADDON_REGISTER, $addons );
+    }
 }
