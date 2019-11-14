@@ -84,7 +84,7 @@ class FoFo_Bec_Theme {
     }
 
     /**
-     * Set the theme the theme passed in as an argument
+     * Set the theme
      * 
      * @param   FoFoBec\FoFo_Bec_Theme  $theme
      * @since 1.1.0
@@ -120,7 +120,7 @@ class FoFo_Bec_Theme {
      * 
      * @see build_feature_registry
      * 
-     * @param   string  $feature_name   The property/feature name to retreive the value for
+     * @param   string  $feature_name   The property/feature name to set the value for
      * @param   string  $value          The vale to set the property to
      * @return void
      * @since 1.1.0
@@ -140,6 +140,7 @@ class FoFo_Bec_Theme {
      * @since 1.1.0
      */
     public function features() {
+        
         return $this->features;
     }
 }

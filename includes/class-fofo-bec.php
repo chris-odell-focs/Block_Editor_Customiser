@@ -83,9 +83,16 @@ class FoFo_Bec {
     /**
      * The theme registry
      * 
-     * @var     FoFo_Bec_Theme_Registry     $theme_registry
+     * @var     \FoFoBec\FoFo_Bec_Theme_Registry     $theme_registry
      */
     private $theme_registry;
+
+    /**
+     * The addon registry
+     * 
+     * @var     \FoFoBec\FoFo_Bec_Addon_Registry     $addon_registry
+     */
+    private $addon_registry;
 
     /**
      * Initialise the plugin
@@ -102,6 +109,7 @@ class FoFo_Bec {
 
         $this->dal = new \FoFoBec\FoFo_Bec_Dal();
         $this->theme_registry = new \FoFoBec\FoFo_Bec_Theme_Registry( $this->dal );
+        $this->addon_registry = new \FoFoBec\FoFo_Bec_Addon_Registry( $this->dal );
 
         $options = $this->dal->get_v1_options();
         if( '' !== $options ) {
@@ -112,6 +120,8 @@ class FoFo_Bec {
         $this->current_bec_theme = \FoFoBec\FoFo_Bec_Upgrader::theme_v100_v110( $this->current_bec_theme );
         $this->current_bec_theme = \FoFoBec\FoFo_Bec_Upgrader::theme_v110_v120( $this->current_bec_theme );
         $this->theme_registry->scan_for_themes();
+
+        $this->addon_registry->load_addons();
     }
 
     /**
@@ -169,7 +179,7 @@ class FoFo_Bec {
         wp_register_script( 
             'fofobec-js', 
             plugin_dir_url( __FILE__ ) . '../js/fofobec.js', 
-            ['jquery', 'wp-editor'],
+            ['jquery', 'wp-editor', 'wp-edit-post'],
             '1.0.2', 
             true 
         );
@@ -181,6 +191,21 @@ class FoFo_Bec {
 
         wp_enqueue_script( 'fofobec-js' );
 
+        wp_register_script( 
+            'fofobec-addon-js', 
+            plugin_dir_url( __FILE__ ) . '../js/fofobec_addon.js', 
+            '1.0.2', 
+            true 
+        );
+
+        wp_localize_script(
+            'fofobec-addon-js', 
+            'fofobec_addon',
+            [ 'ajaxurl'  => admin_url( 'admin-ajax.php' ) ]
+        );
+
+        wp_enqueue_script( 'fofobec-addon-js' );
+
         $dal = new \FoFoBec\FoFo_Bec_Dal();
         $theme_registry = new \FoFoBec\FoFo_Bec_Theme_Registry( $dal );
 
@@ -188,7 +213,7 @@ class FoFo_Bec {
         if( function_exists( 'get_current_screen' ) ) {
 
             $current_screen = get_current_screen();
-            if( 'post' === $current_screen->id ) {
+            if( 'post' === $current_screen->id || 'page' === $current_screen->id) {
 
                 if( '' !== $bec_theme->css ) {
 
@@ -227,6 +252,32 @@ class FoFo_Bec {
                 'dashicons-list-view',
                 '63.05'
             );
+
+            add_submenu_page(
+                'fofo_bec_plugin_page', 
+                "Foxdell Block Editor Customiser Add Ons", 
+                "Add Ons", 
+                'manage_options', 
+                "fofo_bec_plugin_page_addons", 
+                [ $this, 'show_addon_page' ]
+            );
+
+            add_submenu_page(
+                'fofo_bec_plugin_page', 
+                "Foxdell Block Editor Customiser Themes", 
+                "Themes", 
+                'manage_options', 
+                "fofo_bec_plugin_page_themes", 
+                [ $this, 'show_theme_page' ]
+            );
+            
+            /**
+             * Call the hook to load any menus supplied by an addon
+             * 
+             * @param   string  top level menu name
+             * @since   1.4.0
+             */
+            do_action( FOFO_BEC_AFTER_LOAD_MENUS, 'fofo_bec_plugin_page' );
         }
     }
 
@@ -241,15 +292,42 @@ class FoFo_Bec {
      */
     public function show_page() {
 
-        $this->apply_ui_updates();
+        $this->apply_settings_updates();
 
         $page_builder = new \FoFoBec\FoFo_Bec_Page_Builder( $this->current_bec_theme );
         $theme_transform = new \FoFoBec\FoFo_Bec_Theme_Transform( $this->current_bec_theme );
         $theme_settings = $theme_transform->to_ui( $page_builder );
 
-        $composer = new \FoFoBec\FoFo_Bec_Page_Composer( $this->dal, $this->theme_registry );
+        $composer = new \FoFoBec\FoFo_Bec_Page_Composer( [ 'dal' => $this->dal ] );
+        echo $composer->build_page( $this->current_bec_theme->display_name, $theme_settings );
+    }
 
-        echo $composer->build_page( $theme_settings );
+    /**
+     * Display the addon page.
+     * 
+     * @return  void
+     * @since   1.4.0
+     */
+    public function show_addon_page() {
+
+        $activate_result = isset( $_REQUEST[ 'activate_result' ] ) ? $_REQUEST[ 'activate_result' ] : '';
+        $extenstion_manager = new \FoFoBec\FoFo_Bec_Extension_Manager( $this->addon_registry );
+        $extenstion_manager->scan_for_addons();
+        $composer = new \FoFoBec\FoFo_Bec_Page_Composer( [ 'dal' => $this->dal, 'addon_registry' => $this->addon_registry ] );
+        echo $composer->build_addon_page( $activate_result );
+    }
+
+    /**
+     * Display the theme page.
+     * 
+     * @return  void
+     * @since   1.4.0
+     */
+    public function show_theme_page() {
+
+        $composer = new \FoFoBec\FoFo_Bec_Page_Composer( [ 'dal' => $this->dal, 'theme_registry' => $this->theme_registry ] );
+        $composer->apply_ui_updates( $_REQUEST );
+        echo $composer->build_theme_page();
     }
 
     /**
@@ -297,6 +375,13 @@ class FoFo_Bec {
          * @since   1.0.0
          */
         add_action( FOFO_BEC_FEATURE_OFF, [ $this, 'turn_feature_off' ], 1, 10 );
+
+        /**
+         * Hook for the 'apply_addon_updates' to save any updates from an addon
+         * 
+         * @since   1.4.0
+         */
+        add_action( FOFO_BEC_ADDON_APPLY_CHANGES, [ $this, 'apply_addon_updates' ] );
     }
 
     /**
@@ -357,10 +442,8 @@ class FoFo_Bec {
      * @return  void
      * @since   1.0.0
      */
-    private function apply_ui_updates() {
+    private function apply_settings_updates() {
        
-        $composer = new \FoFoBec\FoFo_Bec_Page_Composer( $this->dal, $this->theme_registry );
-        $composer->apply_ui_updates( $_REQUEST );
         $this->current_bec_theme = $this->theme_registry->get_current_theme();
 
         $theme_transform = new \FoFoBec\FoFo_Bec_Theme_Transform( $this->current_bec_theme );
@@ -368,6 +451,44 @@ class FoFo_Bec {
         $this->current_bec_theme = $theme_transform->from_ui( $_REQUEST );
         $this->theme_registry->set_current_theme( $this->current_bec_theme );
 
+        $customiser = new \FoFoBec\FoFo_Bec_Customiser( $this->current_bec_theme, $this->dal );
+        $customiser->apply_changes();
+        $customiser->commit_changes();
+    }
+
+    /**
+     * Activate an addon through an ajax action so if there is a problem
+     * we do not go into recorvery mode.
+     * 
+     * @since 1.4.0
+     * @return  void
+     */
+    public function toggle_addon() {
+
+        $addon_name = isset( $_REQUEST['addon_name'] ) ? $_REQUEST['addon_name']: '';
+        
+        if ( !wp_verify_nonce( $_REQUEST['nonce'], "fofo_bec_".$addon_name ) ) {
+            exit("Cannot verify request");
+        }
+
+        $extension_manager = new \FoFoBec\FoFo_Bec_Extension_Manager( $this->addon_registry );
+        $result = $extension_manager->toggle_addon( $addon_name );
+        echo json_encode( $result );
+
+        wp_die();
+    }
+
+    /**
+     * If an addon needs to apply changes to the JS loaded in 
+     * the Block Editor customiser then the customeriser class needs to
+     * be run and commit the changes.
+     * 
+     * @return  void
+     * @since   1.4.0
+     */
+    public function apply_addon_updates() {
+
+        $this->current_bec_theme = $this->theme_registry->get_current_theme();
         $customiser = new \FoFoBec\FoFo_Bec_Customiser( $this->current_bec_theme, $this->dal );
         $customiser->apply_changes();
         $customiser->commit_changes();

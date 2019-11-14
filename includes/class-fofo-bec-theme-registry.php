@@ -21,6 +21,15 @@ class FoFo_Bec_Theme_Registry {
     private $themes;
 
     /**
+     * @var     array(
+     *      @type   string  $key                The key to the theme in the cache
+     *      @type   \FoFoBec\FoFo_Bec_Theme     The theme
+     * )
+     * @since       1.4.0
+     */
+    private $theme_cache;
+
+    /**
      * The data access layer. Used to abstract out options API
      * 
      * @var FoFoBec\FoFo_Bec_Dal  $dal
@@ -54,7 +63,10 @@ class FoFo_Bec_Theme_Registry {
      */
     public function register_theme( $theme ) {
 
-        $this->themes[ $theme->name ] = $theme;
+        if( !$this->theme_exists( $theme->name ) ) {
+
+            $this->themes[ $theme->name ] = $theme;
+        }
     }
 
     /**
@@ -90,8 +102,7 @@ class FoFo_Bec_Theme_Registry {
         }
 
         do_action( FOFO_BEC_REGISTER_THEME, $this );
-
-        $this->dal->set_registered_themes( $this->themes );
+        $this->update_registered_themes();
     }
 
     /**
@@ -120,6 +131,22 @@ class FoFo_Bec_Theme_Registry {
     }
 
     /**
+     * After a scan update the themes registered in the database
+     * 
+     * @return      void
+     * @since        1.4.0 
+     */
+    private function update_registered_themes() {
+
+        $theme_cache = $this->get_theme_cache();
+        if( is_array( $theme_cache ) && is_array( $this->themes ) ) {
+
+            $this->themes = array_merge( $theme_cache, $this->themes );
+            $this->dal->set_registered_themes( $this->themes );
+        }
+    }
+
+    /**
      * Check to see if a theme exists
      * 
      * @param   string  $theme_name The name of the theme to check exists in the registry.
@@ -129,7 +156,7 @@ class FoFo_Bec_Theme_Registry {
      */
     public function theme_exists( $theme_name ) {
 
-        $registered_themes = $this->dal->get_registered_themes();
+        $registered_themes = $this->get_theme_cache();
         return array_key_exists( $theme_name, $registered_themes );
     }
 
@@ -143,7 +170,7 @@ class FoFo_Bec_Theme_Registry {
      */
     public function get_theme( $theme_name ) {
 
-        $registered_themes = $this->dal->get_registered_themes();
+        $registered_themes = $this->get_theme_cache();
         return $registered_themes[ $theme_name ];
     }
 
@@ -169,5 +196,26 @@ class FoFo_Bec_Theme_Registry {
     public function set_current_theme( $theme ) {
 
         $this->dal->set_current_theme( $theme );
+        $theme_cache = $this->get_theme_cache();
+        $theme_cache[ $theme->name ] = $theme;
+        $this->dal->set_registered_themes( $theme_cache );
+    }
+
+    /**
+     * Get the cache of registered themes
+     * 
+     * @return     array(
+     *      @type   string  $key                The key to the theme in the cache
+     *      @type   \FoFoBec\FoFo_Bec_Theme     The theme
+     * )
+     * @since   1.4.0
+     */
+    private function get_theme_cache() {
+
+        if( null === $this->theme_cache ) {
+            $this->theme_cache = $this->dal->get_registered_themes();
+        }
+        
+        return $this->theme_cache;
     }
 }

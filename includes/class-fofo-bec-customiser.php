@@ -15,18 +15,37 @@ namespace FoFoBec;
 class FoFo_Bec_Customiser {
 
     /**
-     * @var string  $js_template    The javascript which will be output to the block editor
+     * The template for the top part of the dynamic js function
      * 
-     * @since 1.1.0
+     * @var     string  $js_template_func_signature
+     * @since   1.4.0
      */
-    private $js_template = '
+    private $js_template_func_signature = '
 
 const fofobec_function_dispatcher = ( wpStore )  => {
 
+    ';
+
+    /**
+     * The template for the setup of the higher order functions
+     * 
+     * @var     string      $js_template_func_body
+     * @since   1.4.0
+     */
+    private $js_template_func_body = '
     const store = fofobecCoreEditPostStore(wpStore.select, wpStore.dispatch);
     const doRemovePanel = store.doRemovePanel;
     const doToggleFeature = store.doToggleFeature;
     const removeElement = fofo_bec_dom(jQuery).removeElement;
+    '; 
+
+    /**
+     * The template for the end of the function
+     * 
+     * @var     string      $js_template_func_close
+     * @since 1.4.0
+     */
+    private $js_template_func_close = '
 
     return {
         {[function_list]}
@@ -35,20 +54,12 @@ const fofobec_function_dispatcher = ( wpStore )  => {
     ';
 
     /**
-     * The list of JS functions added to as commands are run.
+     * The list of functions to add to the js
      * 
-     * @var string  $function_list
-     * 
-     * @since 1.1.0
+     * @var     string      $function_list
+     * @since 1.4.0
      */
     private $function_list;
-
-    /**
-     * The function list delimeter
-     * 
-     * @var string  $list_delim
-     */
-    private $list_delim = '';
 
     /**
      * Registry of functions which can be called to customise the block editor
@@ -150,7 +161,7 @@ const fofobec_function_dispatcher = ( wpStore )  => {
      */
     public function commit_changes() {
 
-        $js = str_replace( '{[function_list]}', $this->function_list, $this->js_template );
+        $js = $this->compose_js();
         $this->dal->set_generated_js( $js );
     }
 
@@ -167,7 +178,8 @@ const fofobec_function_dispatcher = ( wpStore )  => {
 
         $js = $this->dal->get_generated_js();
         if( '' === $js ) {
-            $js = str_replace( '{[function_list]}', $this->function_registery[ 'default' ], $this->js_template );
+            $this->add_js_function( $this->function_registery[ 'default' ] );
+            $js = $this->compose_js();
         }
 
         return $js;
@@ -183,10 +195,24 @@ const fofobec_function_dispatcher = ( wpStore )  => {
      */
     private function add_js_function( $text ) {
 
-        $this->function_list .= $this->list_delim.$text;
+        $this->function_list[] = $text;
+    }
 
-        if( '' === $this->list_delim ) {
-            $this->list_delim = ','.PHP_EOL;
-        }
+    /**
+     * Compose the javascript from the three templates and the function list
+     * 
+     * @return      string      The javascript
+     * @since       1.4.0
+     */
+    private function compose_js() {
+
+        $js_parts = [ 'body' => $this->js_template_func_body, 'functions' => $this->function_list ];
+        $js_parts = apply_filters( FOFO_BEC_BEFORE_COMPOSE_JS, $js_parts );
+
+        $js = $this->js_template_func_signature;
+        $js .= $js_parts[ 'body' ];
+        $js .= str_replace( '{[function_list]}', implode( ','.PHP_EOL, $js_parts[ 'functions' ] ), $this->js_template_func_close );
+        
+        return $js;
     }
 }

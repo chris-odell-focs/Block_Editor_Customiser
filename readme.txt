@@ -4,7 +4,7 @@ Donate link: https://ko-fi.com/chrisodell
 Tags: gutenberg, block-editor, customize
 Requires at least: 5.1
 Tested up to: 5.2.3
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -64,6 +64,46 @@ It can also be installed manually.
 1. The FoFo Block Customiser screen (1.png).
 
 == Changelog ==
+
+= 1.4.0 =
+
+* Added the 'Disable Core Blocks' addon
+* Added the FoFo_Bec_Addon_Registry in class-fofo-bec-addon-registry.php file.
+* Added the FoFo_Bec_Addon in class-fofo-bec-addon.php.
+* Modified the JS template in the class-fofo-bec-cuustomiser.php file to be more 'pluggable'.
+* Added a 'compose_js' function in the class-fofo-bec-cuustomiser.php file to enabled hooking into the JS template.
+* Modified the 'get_javascript' function in the class-fofo-bec-cuustomiser.php file to call the 'compose_js' function.
+* Added the 'get_addons' and 'set_addons' to the FoFo_Bec_Dal class in the class-fofo-bec-dal.php file.
+* Added the 'FoFo_Bec_Extension_Manager' in the class-fofo-bec-extension-manager.php file to manage extension activation & deactivation.
+* Modified the contructor in class 'FoFo_Bec_Page_Composer' in the file class-fofo-bec-composer.php to take dependencies as an array.
+* Addded a dependency on the Addon registry to the 'FoFo_Bec_Page_Composer' class.
+* Modified the function 'build_page' in the 'FoFo_Bec_Page_Composer' class to just display the current theme settings.
+* Added the 'build_theme_page' function to the 'FoFo_Bec_Page_Composer' class to display the theme selector.
+* Added the 'build_addon_page' function to the 'FoFo_Bec_Page_Composer' class to display the list of available addons & allow addon activitation/deactivation.
+* Moved the defines for 'FOFO_BEC_JS_KEY' and 'FOFO_BEC_REQUEST_KEY' to the 'define_general' in the 'FoFo_Bec_Shared' in file class-fofo-bec-shared.php.
+* Added two new methods 'defines_for_themes' and 'defines_for_addons' to the 'FoFo_Bec_Shared' class.
+* Added defines for addon management to the 'FoFo_Bec_Shared' class.
+* Added defines for addon hooks as part of addon integration in the 'FoFo_Bec_Shared' class.
+* Added check to see if theme already exists when registering a theme in class 'FoFo_Bec_Theme_Registry' in file class-fofo-bec-theme-registry.php.
+* Added member level variable to cache theme data in 'FoFo_Bec_Theme_Registry' to prevent multiple database hits.
+* Modified functon 'scan_for_themes' in 'FoFo_Bec_Theme_Registry' to call new function 'update_registered_themes'.
+* Added function 'update_registered_themes' in 'FoFo_Bec_Theme_Registry' to merge changes from the theme cache and updated theme before saving.
+* Modified function 'theme_exists' in 'FoFo_Bec_Theme_Registry' to get the theme from the internal theme cache.
+* Modified function 'get_theme' in 'FoFo_Bec_Theme_Registry' to use the internal theme cache.
+* Modified function 'set_current_theme' in 'FoFo_Bec_Theme_Registry' to save the theme changes correctly.
+* Added the function 'get_theme_cache' to the 'FoFo_Bec_Theme_Registry' class.
+* Fixed comments in file class-fofo-bec-theme.php.
+* Added the addon registry to the core 'FoFo_Bec' class in the file class-fofo-bec.php.
+* Added creaton of an addon registry instance in function 'attach' of class 'FoFo_Bec'.
+* Modified the 'load_scripts' function in class 'FoFo_Bec' to load scripts for addon management.
+* Modified function 'add_plugin_page' in class 'FoFo_Bec' so that themes and addons can now be managed from their own pages.
+* Modified function 'show_page' in class 'FoFo_Bec' so that the core plugin page just shows settings for the current theme.
+* Added a 'show_addon_page' function to class 'FoFo_Bec' to display and manage available addons.
+* Added a 'show_theme_page' function to class 'FoFo_Bec' to display and manage available themes.
+* Added the hook 'FOFO_BEC_ADDON_APPLY_CHANGES' in class 'FoFo_Bec' to cascade changes made by an addon.
+* Added a 'toggle_addon' function to class 'FoFo_Bec' to enable/disable an addon(called via ajax).
+* Added a 'apply_addon_updates' function to class 'FoFo_Bec' to cascade JS changes from addons.
+* Fix issue with theme not loading on 'edit page' as well as 'edit post'.
 
 = 1.3.0 =
 * Removed the 'fofobec_get_removeEditorPanel' javascript function from the template in class-fofo-bec-customiser.php.
