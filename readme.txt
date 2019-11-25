@@ -16,8 +16,10 @@ Customise you Block Editor experience, or customise the experience on client sit
 After the plugin has been installed features of the Block Editor can be turned off and on using the settings page
 or the two hooks provided which can be called with do_action.
 
-The plugin also allows customisation of the look and feel of the Block Editor through the selection of themes. Themes bundled with the
-plugin are the Default theme, which has the same look and feel as the base Block Editor, and the VS Light theme which emulates the Light theme in VS Code.
+The plugin also allows customisation of the look and feel of the Block Editor through the selection of themes. The only theme bundled with the 
+plugin is the Default theme, which has the same look and feel as the base Block Editor.
+
+Other themes can be found by seraching the wordPress.org plugin repository.
 
 The two hooks are:-
 
