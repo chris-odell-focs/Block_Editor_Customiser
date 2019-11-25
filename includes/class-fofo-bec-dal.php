@@ -50,13 +50,7 @@ class FoFo_Bec_Dal {
      */
     public function get_current_theme() {
 
-        $theme = new \FoFoBec\FoFo_Bec_Theme();
-        $theme->name = 'default';
-        $theme->display_name = 'Default';
-        $theme->settings_page = 'settings';
-        $theme->css = '';
-
-        return get_option( FOFO_BEC_CURRENT_THEME, $theme );
+        return get_option( FOFO_BEC_CURRENT_THEME, null );
     }
 
     /**
@@ -123,7 +117,7 @@ class FoFo_Bec_Dal {
      */
     public function get_registered_themes() {
 
-        return get_option( FOFO_BEC_THEME_REGISTER, [] );
+        return get_option( FOFO_BEC_THEME_REGISTER, null );
     }
 
     /**

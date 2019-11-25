@@ -121,7 +121,8 @@ class FoFo_Bec_Theme_Transform {
         extract( [ 'page_builder' => $page_builder ] );
         ob_start();	
         
-        include_once FOFO_BEC_THEME_REPO_DIR.'/'.$this->bec_theme->name.'/'.$this->bec_theme->settings_page.'.php';
+        include_once $this->bec_theme->my_location;
+        echo call_user_func_array( $this->bec_theme->settings_page, [ $page_builder ] );
         
         return ob_get_clean();        
     }

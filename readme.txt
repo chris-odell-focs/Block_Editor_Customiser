@@ -4,7 +4,7 @@ Donate link: https://ko-fi.com/chrisodell
 Tags: gutenberg, block-editor, customize
 Requires at least: 5.1
 Tested up to: 5.2.3
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -65,6 +65,43 @@ It can also be installed manually.
 
 == Changelog ==
 
+= 1.5.0 =
+
+* ** BREAKING CHANGE ** Themes are no longer added in their own folder below this plugin but now need to be added as a plugin in their own right.
+* Removed the VS Light theme folder and contents.
+* Changed definition for addon to extenstion to better reflect conceptual level model. The definitions changed are :- FOFO_BEC_ADDON_VERSION_KEY, 
+    FOFO_BEC_ADDON_NAME_KEY and FOFO_BEC_ADDON_DESCRIPTION_KEY.
+* Modified addon definitions in class 'FoFo_Bec_Shared' in file class-fofo-bec-shared.php (as above).
+* Updated definitions in class 'FoFo_Bec_Addon_Registry' in file class-fofo-bec-addon-registry.php.
+* Updated definitions in class 'FoFo_Bec_Addon' in file class-fofo-bec-addon.php.
+* Modified function 'get_current_theme' in class 'FoFo_Bec_Dal' in file class-fofo-bec-dal so that the default theme is no longer defined.
+* Modified function 'get_registered_themes' in class 'FoFo_Bec_Dal' to return null vs returning an empty array.
+* Updated definitions in class 'FoFo_Bec_Extension_Manager' in file class-fofof-bec-extension-manager.php.
+* Changed constructor of class 'FoFo_Bec_Extension_Manager' to inject a theme registry instance.
+* Added the 'scan_for_themes' function to the class 'FoFo_Bec_Extension_Manager'.
+* Modified the 'get_theme_selector' function in class 'FoFo_Bec_Page_Composer' in file class-fofo-bec-page-composer.php to return current theme using theme registry.
+* Added 'ensure_theme_version' function to class 'FoFo_Bec_Theme_Registry' in file class-fofo-bec-theme-registry.php to ensure theme object is latest version.
+* Modified the 'register_theme' function in class 'FoFo_Bec_Theme_Registry' to call ensure_theme_version.
+* Removed the 'scan_for_themes' function from class 'FoFo_Bec_Theme_Registry'.
+* Removed the 'includes_existing_register_function' function from class 'FoFo_Bec_Theme_Registry'.
+* Removed the 'update_registered_themes' function from class 'FoFo_Bec_Theme_Registry'.
+* Added the 'commit_registered_theme_changes' function to class 'FoFo_Bec_Theme_Registry'.
+* Modified the 'theme_exists' function in class 'FoFo_Bec_Theme_Registry' to check if the theme registry is null.
+* Modified the 'get_current_theme' function in class 'FoFo_Bec_Theme_Registry' to update the current theme to the correct version and set the default theme as current as required.
+* Modified the 'set_current_theme' function in class 'FoFo_Bec_Theme_Registry' to update the current theme to the correct version.
+* Added the 'list_themes' function to class 'FoFo_Bec_Theme_Registry'.
+* Added the 'clear_themes' function to class 'FoFo_Bec_Theme_Registry'.
+* Added the 'ensure_theme_version' function to class 'FoFo_Bec_Theme_Registry'.
+* Added the 'ensure_have_theme' function to class 'FoFo_Bec_Theme_Registry' to return the default theme if the theme being checked is empty.
+* Modified function 'to_ui' in class 'FoFo_Bec_Theme_Transform' in file class-fofo-bec-theme-transform.php to use callable defined in theme for settings page render.
+* Modified the version number in class 'FoFo_Bec_Theme' in file class-fofo-bec-theme.php.
+* Added the new property 'my_location' to class 'FoFo_Bec_Theme'.
+* Fixed typo in function 'theme_v110_v120' in class 'FoFo_Bec_Upgrader' in file class-fofo-bec-upgrader.php.
+* Added function 'theme_to_v130' in class 'FoFo_Bec_Upgrader'.
+* Modified the 'attach' function in class 'FoFo_Bec' in file class-fofo-bec.php to use the extension manager.
+* Modified the 'load_scripts' function in class 'FoFo_Bec' to use the full css url supplied by a theme vs the location in the theme sub folder.
+* Added the default theme file fofo-bec-default-theme.php. 
+ 
 = 1.4.0 =
 
 * Added the 'Disable Core Blocks' addon

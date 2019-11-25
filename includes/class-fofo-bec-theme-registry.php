@@ -63,10 +63,8 @@ class FoFo_Bec_Theme_Registry {
      */
     public function register_theme( $theme ) {
 
-        if( !$this->theme_exists( $theme->name ) ) {
-
-            $this->themes[ $theme->name ] = $theme;
-        }
+        $theme = $this->ensure_theme_version( $theme );
+        $this->themes[ $theme->name ] = $theme;
     }
 
     /**
@@ -81,69 +79,14 @@ class FoFo_Bec_Theme_Registry {
     }
 
     /**
-     * Scan the themes folder for available themes.
-     * 
-     * Scans the theme folder and looks for an init.php. The init.php should
-     * have a call to the fofo_bec_register_theme action hook, which in turn
-     * calls the callable to perform the theme registration
-     * 
-     * @return  void
-     * @since 1.2.0
-     */
-    public function scan_for_themes() {
-
-        $dirs = array_filter( glob(FOFO_BEC_THEME_REPO_DIR.'/*'), 'is_dir' );
-        foreach( $dirs as $dir ) {
-
-            if( !$this->includes_existing_register_function( $dir.'/init.php' ) ) {
-
-                include_once $dir.'/init.php';
-            }
-        }
-
-        do_action( FOFO_BEC_REGISTER_THEME, $this );
-        $this->update_registered_themes();
-    }
-
-    /**
-     * Check to see if the callable to register the theme in the theme init file
-     * already exists.
-     * 
-     * @param   string  $init_location  The file location of the theme init file.
-     * 
-     * @return  bool    True if callable already exists.
-     * @since   1.3.0
-     */
-    private function includes_existing_register_function( $init_location ) {
-        
-        $init_file = file_get_contents( $init_location );
-        $matches = [];
-        preg_match_all( '/add_action.*,(.*)\)/', $init_file, $matches );
-
-        if( isset( $matches[1][0] ) ) {
-
-            $register_function_name = str_replace( "'", '', $matches[1][0] );
-            $register_function_name = trim( str_replace( '"', '', $register_function_name ) );
-            return function_exists( $register_function_name );
-        }
-
-        return false;
-    }
-
-    /**
      * After a scan update the themes registered in the database
      * 
      * @return      void
      * @since        1.4.0 
      */
-    private function update_registered_themes() {
+    public function commit_registered_theme_changes() {
 
-        $theme_cache = $this->get_theme_cache();
-        if( is_array( $theme_cache ) && is_array( $this->themes ) ) {
-
-            $this->themes = array_merge( $theme_cache, $this->themes );
-            $this->dal->set_registered_themes( $this->themes );
-        }
+        $this->dal->set_registered_themes( $this->themes );
     }
 
     /**
@@ -157,6 +100,11 @@ class FoFo_Bec_Theme_Registry {
     public function theme_exists( $theme_name ) {
 
         $registered_themes = $this->get_theme_cache();
+
+        if( $registered_themes === null ) {
+            return false;
+        }
+
         return array_key_exists( $theme_name, $registered_themes );
     }
 
@@ -182,7 +130,11 @@ class FoFo_Bec_Theme_Registry {
      */
     public function get_current_theme() {
 
-        return $this->dal->get_current_theme();
+        $current_theme = $this->dal->get_current_theme();
+        $current_theme = $this->ensure_have_theme( $current_theme );
+        $current_theme = $this->ensure_theme_version( $current_theme );
+
+        return $current_theme;
     }
 
     /**
@@ -195,10 +147,26 @@ class FoFo_Bec_Theme_Registry {
      */
     public function set_current_theme( $theme ) {
 
+        $theme = $this->ensure_theme_version( $theme );
+
         $this->dal->set_current_theme( $theme );
         $theme_cache = $this->get_theme_cache();
         $theme_cache[ $theme->name ] = $theme;
         $this->dal->set_registered_themes( $theme_cache );
+    }
+
+    /**
+     * List the themes which are registered
+     * 
+     * @return  array   {
+     *      @type   \FoFoBec\FoFo_Bec_Theme
+     * }
+     * 
+     * @since 1.5.0
+     */
+    public function list_themes() {
+
+        return $this->dal->get_registered_themes();
     }
 
     /**
@@ -213,9 +181,54 @@ class FoFo_Bec_Theme_Registry {
     private function get_theme_cache() {
 
         if( null === $this->theme_cache ) {
+            
             $this->theme_cache = $this->dal->get_registered_themes();
         }
         
         return $this->theme_cache;
+    }
+
+    /**
+     * Clear the theme registry
+     * 
+     * @return  void
+     * @since 1.5.0
+     */
+    public function clear_themes() {
+
+        $this->dal->set_registered_themes([]);
+    }
+
+    /**
+     * Ensure a theme is at the latest version
+     * 
+     * @return  void
+     * @since   1.5.0 
+     */
+    private function ensure_theme_version( $theme ) {
+
+        $theme = \FoFoBec\FoFo_Bec_Upgrader::theme_to_v130( $theme );
+        return $theme;
+    }
+
+    /**
+     * Check if a theme exists in the registry of if the theme is
+     * empty and return the default theme if it is.
+     * 
+     * @return  \FoFoBec\FoFo_Bec_Theme
+     * @since   1.5.0
+     */
+    private function ensure_have_theme( $theme ) {
+
+        $return_default = $theme == null;
+        $return_default = !$return_default ? !$this->theme_exists( $theme->name ) : true;
+
+        if( $return_default ) {
+
+            $default = $this->get_theme( 'default' );
+            return $default;
+        }
+
+        return $theme;
     }
 }

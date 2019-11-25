@@ -44,6 +44,18 @@ class FoFo_Bec_Shared {
         if( !defined( 'FOFO_BEC_REQUEST_KEY' ) ) {
             define( 'FOFO_BEC_REQUEST_KEY', 'fofo_bec' );
         }
+
+        if( !defined( 'FOFO_BEC_EXTENSION_VERSION_KEY' ) ) {
+            define( 'FOFO_BEC_EXTENSION_VERSION_KEY', 'version' );
+        }
+
+        if( !defined( 'FOFO_BEC_EXTENSION_NAME_KEY' ) ) {
+            define( 'FOFO_BEC_EXTENSION_NAME_KEY', 'name' );
+        }
+
+        if( !defined( 'FOFO_BEC_EXTENSION_DESCRIPTION_KEY' ) ) {
+            define( 'FOFO_BEC_EXTENSION_DESCRIPTION_KEY', 'description' );
+        }
     }
 
     /**
@@ -62,20 +74,8 @@ class FoFo_Bec_Shared {
             define( 'FOFO_BEC_ADDON_REPO_DIR', dirname( __FILE__ ).'/../addons' );
         }
 
-        if( !defined( 'FOFO_BEC_ADDON_VERSION_KEY' ) ) {
-            define( 'FOFO_BEC_ADDON_VERSION_KEY', 'version' );
-        }
-
-        if( !defined( 'FOFO_BEC_ADDON_NAME_KEY' ) ) {
-            define( 'FOFO_BEC_ADDON_NAME_KEY', 'name' );
-        }
-
         if( !defined( 'FOFO_BEC_ADDON_DISPLAY_NAME_KEY' ) ) {
             define( 'FOFO_BEC_ADDON_DISPLAY_NAME_KEY', 'display_name' );
-        }
-
-        if( !defined( 'FOFO_BEC_ADDON_DESCRIPTION_KEY' ) ) {
-            define( 'FOFO_BEC_ADDON_DESCRIPTION_KEY', 'description' );
         }
 
         if( !defined( 'FOFO_BEC_ADDON_SCHEMA_VERSION' ) ) {

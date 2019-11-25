@@ -41,13 +41,13 @@ class FoFo_Bec_Addon {
     private function set_defaults() {
 
         $this->properties = [
-            FOFO_BEC_ADDON_NAME_KEY => 'name',
-            FOFO_BEC_ADDON_DESCRIPTION_KEY => '',
+            FOFO_BEC_EXTENSION_NAME_KEY => 'name',
+            FOFO_BEC_EXTENSION_DESCRIPTION_KEY => '',
             FOFO_BEC_ADDON_DISPLAY_NAME_KEY => '',
             FOFO_BEC_ADDON_SCHEMA_VERSION => '1.0.0',
             FOFO_BEC_ADDON_FILE_LOCATION_KEY => '',
             FOFO_BEC_ADDON_ACTIVATED_KEY => '',
-            FOFO_BEC_ADDON_VERSION_KEY => ''
+            FOFO_BEC_EXTENSION_VERSION_KEY => ''
         ];
     }
 
