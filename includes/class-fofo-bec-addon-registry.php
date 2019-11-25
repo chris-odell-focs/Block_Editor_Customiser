@@ -66,15 +66,15 @@ class FoFo_Bec_Addon_Registry {
      */
     public function update( $header ) {
 
-        $name = $this->sanitize_addon_name( $header[ FOFO_BEC_ADDON_NAME_KEY ] );
-        $version = $header[ FOFO_BEC_ADDON_VERSION_KEY ];
+        $name = $this->sanitize_addon_name( $header[ FOFO_BEC_EXTENSION_NAME_KEY ] );
+        $version = $header[ FOFO_BEC_EXTENSION_VERSION_KEY ];
         $addon = $this->get_addon( $name );
         if( $addon->version !== $version ) {
 
             $addon->version = $version;
             $addon->name = $name;
-            $addon->display_name = $header[ FOFO_BEC_ADDON_NAME_KEY ];
-            $addon->description = $header[ FOFO_BEC_ADDON_DESCRIPTION_KEY ];
+            $addon->display_name = $header[ FOFO_BEC_EXTENSION_NAME_KEY ];
+            $addon->description = $header[ FOFO_BEC_EXTENSION_DESCRIPTION_KEY ];
 
             $registry = $this->get_registry();
             $registry[ $name ] = $addon;
@@ -96,10 +96,10 @@ class FoFo_Bec_Addon_Registry {
     public function add( $header, $file ) {
 
         $addon = $this->get_new_addon();
-        $addon->name = $this->sanitize_addon_name( $header[ FOFO_BEC_ADDON_NAME_KEY ] );
-        $addon->display_name = $header[ FOFO_BEC_ADDON_NAME_KEY ];
-        $addon->description = $header[ FOFO_BEC_ADDON_DESCRIPTION_KEY ];
-        $addon->version = $header[ FOFO_BEC_ADDON_VERSION_KEY ];
+        $addon->name = $this->sanitize_addon_name( $header[ FOFO_BEC_EXTENSION_NAME_KEY ] );
+        $addon->display_name = $header[ FOFO_BEC_EXTENSION_NAME_KEY ];
+        $addon->description = $header[ FOFO_BEC_EXTENSION_DESCRIPTION_KEY ];
+        $addon->version = $header[ FOFO_BEC_EXTENSION_VERSION_KEY ];
         $addon->file_location = $file;
         $addon->activated = FOFO_BEC_ADDON_DEACTIVATED_STATE;
 

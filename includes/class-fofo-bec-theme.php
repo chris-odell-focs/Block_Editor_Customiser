@@ -53,9 +53,10 @@ class FoFo_Bec_Theme {
             'edit_post_more_menu' => FOFO_BEC_PANEL_ON,
             'name' => '',
             'display_name' => '',
-            'version' => '1.2.0',
+            'version' => '1.3.0',
             'settings_page' => '',
-            'css' => ''
+            'css' => '',
+            'my_location' => ''
         ];
     }
 

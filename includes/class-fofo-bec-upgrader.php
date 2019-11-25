@@ -59,15 +59,48 @@ class FoFo_Bec_Upgrader {
             $converted->featured_image_panel = $v110Theme->featured_image_panel;
             $converted->excerpt_panel = $v110Theme->excerpt_panel;
             $converted->discussion_panel = $v110Theme->discussion_panel;
-            $converted->permalink_panel = $v110Theme->permalinkv110Theme_panel;
+            $converted->permalink_panel = $v110Theme->permalink_panel;
             $converted->name = $v110Theme->name;
             $converted->display_name = $v110Theme->display_name;
             $converted->version = '1.2.0';
             $converted->settings_page = $v110Theme->settings_page;
-
+            
             return $converted;
         }
 
         return $v110Theme;
+    }
+
+    /**
+     * Migrate a theme to version 1.3.0
+     * 
+     * @param   \FoFoBec\FoFo_Bec_Theme     The theme
+     * 
+     * @return  \FoFoBec\FoFo_Bec_Theme     The migrated version 1.3.0 of the theme
+     * @since   1.5.0
+     */
+    public static function theme_to_v130( $theme ) {
+
+        $theme = self::theme_v100_v110( $theme );
+        $theme = self::theme_v110_v120( $theme );
+
+        if( '1.2.0' === $theme->version) {
+
+            $converted = new \FoFoBec\FoFo_Bec_Theme();
+            $converted->category_panel = $theme->category_panel;
+            $converted->tag_panel = $theme->tag_panel;
+            $converted->featured_image_panel = $theme->featured_image_panel;
+            $converted->excerpt_panel = $theme->excerpt_panel;
+            $converted->discussion_panel = $theme->discussion_panel;
+            $converted->permalink_panel = $theme->permalink_panel;
+            $converted->name = $theme->name;
+            $converted->display_name = $theme->display_name;
+            $converted->version = '1.3.0';
+            $converted->settings_page = $theme->settings_page;
+
+            return $converted;
+        }
+
+        return $theme;
     }
 }

@@ -172,7 +172,7 @@ class FoFo_Bec_Page_Composer {
             <label>Selected Theme</label>
             <select name="'.esc_attr( FOFO_BEC_REQUEST_KEY.'['.FOFO_BEC_SELECTED_THEME_NAME.']').'">';
 
-        $current_theme = $this->dal->get_current_theme();
+        $current_theme = $this->theme_registry->get_current_theme();
         
         foreach( $registered_themes as $key => $theme ) {
 

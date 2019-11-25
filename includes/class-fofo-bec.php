@@ -95,6 +95,13 @@ class FoFo_Bec {
     private $addon_registry;
 
     /**
+     * The extension manager
+     * 
+     * @var     \FoFoBec\FoFo_Bec_Extension_Manager     $extension_manager
+     */
+    private $extension_manager;
+
+    /**
      * Initialise the plugin
      * 
      * @return  void
@@ -111,15 +118,18 @@ class FoFo_Bec {
         $this->theme_registry = new \FoFoBec\FoFo_Bec_Theme_Registry( $this->dal );
         $this->addon_registry = new \FoFoBec\FoFo_Bec_Addon_Registry( $this->dal );
 
+        $this->extenstion_manager = new \FoFoBec\FoFo_Bec_Extension_Manager([ 
+            'addon_registry' => $this->addon_registry, 
+            'theme_registry' => $this->theme_registry 
+        ]);
+
         $options = $this->dal->get_v1_options();
         if( '' !== $options ) {
             $this->convert_to_theme( $options );
         }
 
+        $this->extenstion_manager->scan_for_themes();
         $this->current_bec_theme = $this->theme_registry->get_current_theme();
-        $this->current_bec_theme = \FoFoBec\FoFo_Bec_Upgrader::theme_v100_v110( $this->current_bec_theme );
-        $this->current_bec_theme = \FoFoBec\FoFo_Bec_Upgrader::theme_v110_v120( $this->current_bec_theme );
-        $this->theme_registry->scan_for_themes();
 
         $this->addon_registry->load_addons();
     }
@@ -218,9 +228,7 @@ class FoFo_Bec {
                 if( '' !== $bec_theme->css ) {
 
                     $theme_style_slug = 'fofobec-themcss-'.$bec_theme->name;
-                    $theme_css_url = FOFO_BEC_THEME_REPO_URL.$bec_theme->name.'/'.$bec_theme->css.'.css';
-
-                    wp_register_style( $theme_style_slug, $theme_css_url, false, '1.0.0' );
+                    wp_register_style( $theme_style_slug, $bec_theme->css, false, '1.0.0' );
                     wp_enqueue_style( $theme_style_slug );
                 }
             }

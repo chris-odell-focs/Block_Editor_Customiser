@@ -21,11 +21,28 @@ class FoFo_Bec_Extension_Manager {
     private $addon_registry;
 
     /**
+     * A theme registry instance
+     * 
+     * @var \FoFoBec\FoFo_Bec_Theme_Registry
+     * @since 1.5.0
+     */
+    private $theme_registry;
+
+    /**
      * Initialisation
      */
-    public function __construct( $addon_registry ) {
+    public function __construct( $injectables ) {
 
-        $this->addon_registry = $addon_registry;
+        if( !isset( $injectables[ 'addon_registry' ] ) ) {
+            throw new \Exception('addon_registry not available in extension manager');
+        }
+
+        if( !isset( $injectables[ 'theme_registry' ] ) ) {
+            throw new \Exception('theme_registry not available in extension manager');
+        }
+
+        $this->addon_registry = $injectables[ 'addon_registry' ];
+        $this->theme_registry = $injectables[ 'theme_registry' ];
     }
 
     /**
@@ -48,9 +65,9 @@ class FoFo_Bec_Extension_Manager {
             foreach( $files as $file ) {
 
                 $expected_headers = [ 
-                    FOFO_BEC_ADDON_DESCRIPTION_KEY => FOFO_BEC_ADDON_DESCRIPTION_KEY, 
-                    FOFO_BEC_ADDON_NAME_KEY => FOFO_BEC_ADDON_NAME_KEY, 
-                    FOFO_BEC_ADDON_VERSION_KEY => FOFO_BEC_ADDON_VERSION_KEY 
+                    FOFO_BEC_EXTENSION_DESCRIPTION_KEY => FOFO_BEC_EXTENSION_DESCRIPTION_KEY, 
+                    FOFO_BEC_EXTENSION_NAME_KEY => FOFO_BEC_EXTENSION_NAME_KEY, 
+                    FOFO_BEC_EXTENSION_VERSION_KEY => FOFO_BEC_EXTENSION_VERSION_KEY 
                 ];
 
                 $header = array_change_key_case( $this->get_file_data( $file, $expected_headers ) );
@@ -67,6 +84,22 @@ class FoFo_Bec_Extension_Manager {
                 }
             }
         }
+    }
+
+    /**
+     * Scan for themes
+     * 
+     * Scan for themes which have been added as external plugins
+     *  
+     * @return  void
+     * @since   1.5.0
+     */
+    public function scan_for_themes() {
+        
+        include_once( dirname(__FILE__).'/fofo-bec-default-theme.php' );
+
+        do_action( FOFO_BEC_REGISTER_THEME, $this->theme_registry );
+        $this->theme_registry->commit_registered_theme_changes();    
     }
 
     /**
@@ -128,9 +161,9 @@ class FoFo_Bec_Extension_Manager {
         
         if( 0 !== count( $header ) ) {
 
-            return array_key_exists( FOFO_BEC_ADDON_DESCRIPTION_KEY, $header ) &&
-                array_key_exists( FOFO_BEC_ADDON_NAME_KEY, $header ) &&
-                array_key_exists( FOFO_BEC_ADDON_VERSION_KEY, $header );
+            return array_key_exists( FOFO_BEC_EXTENSION_DESCRIPTION_KEY, $header ) &&
+                array_key_exists( FOFO_BEC_EXTENSION_NAME_KEY, $header ) &&
+                array_key_exists( FOFO_BEC_EXTENSION_VERSION_KEY, $header );
         }
 
         return false;
