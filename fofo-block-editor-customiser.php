@@ -82,6 +82,12 @@ function fofo_bec_start() {
     $fofobec->attach();
 }
 
+/**
+ * Bootstrap the plugin after the core of WordPress has loaded to ensure that
+ * that any plugins which depend on the Block Editor Customiser have loaded.
+ * 
+ * @since 1.6.0
+ */
 add_action( 'wp_loaded', 'fofo_bec_start' );
 
 
