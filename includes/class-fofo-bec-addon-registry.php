@@ -199,7 +199,7 @@ class FoFo_Bec_Addon_Registry {
     public function list_addons() {
 
         $this->ensure_registry();
-        return $this->registry();
+        return $this->registry;
     }
 
     // /**

@@ -320,8 +320,7 @@ class FoFo_Bec {
     public function show_addon_page() {
 
         $activate_result = isset( $_REQUEST[ 'activate_result' ] ) ? $_REQUEST[ 'activate_result' ] : '';
-        $extenstion_manager = new \FoFoBec\FoFo_Bec_Extension_Manager( $this->addon_registry );
-        $extenstion_manager->scan_for_addons();
+        $this->extenstion_manager->scan_for_addons();
         $composer = new \FoFoBec\FoFo_Bec_Page_Composer( [ 'dal' => $this->dal, 'addon_registry' => $this->addon_registry ] );
         echo $composer->build_addon_page( $activate_result );
     }
