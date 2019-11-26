@@ -67,6 +67,10 @@ It can also be installed manually.
 
 == Changelog ==
 
+= 1.5.1 =
+
+* Fix error with displaying addon page.
+
 = 1.5.0 =
 
 * ** BREAKING CHANGE ** Themes are no longer added in their own folder below this plugin but now need to be added as a plugin in their own right.
