@@ -85,24 +85,6 @@ function fofo_bec_start() {
 add_action( 'wp_loaded', 'fofo_bec_start' );
 
 
-// /**
-//  * Ajax action to activate an extension. If there is an error
-//  * in the activation process then the error function in the json
-//  * call will be activated.
-//  * 
-//  * @since	1.4.0
-//  * @return 	json success.	
-//  */
-// function fofo_bec_toggle_addon() {
-
-// 	$fofobec = new \FoFoBec\FoFo_Bec();
-// 	$fofobec->attach();
-// 	$fofobec->toggle_addon();
-// };
-
-// add_action("wp_ajax_fofo_bec_toggle_addon", "fofo_bec_toggle_addon");
-
-
 
 
 

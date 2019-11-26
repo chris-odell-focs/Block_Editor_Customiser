@@ -230,7 +230,6 @@ class FoFo_Bec_Page_Composer {
                     <table class="wp-list-table widefat">
                         <thead>
                         <tr>
-                            <th class="manage-column column-cb check-column"></th>
                             <th class="manage-column column-name column-primary">Name</th>
                             <th class="manage-column column-description">Description</th>
                         </tr>
