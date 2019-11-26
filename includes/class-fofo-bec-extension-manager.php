@@ -45,6 +45,47 @@ class FoFo_Bec_Extension_Manager {
         $this->theme_registry = $injectables[ 'theme_registry' ];
     }
 
+    // /**
+    //  * Scan for addons
+    //  * 
+    //  * During the scan the addon header is checked, and if the 
+    //  * addon is not in the registry, or if the version number has changed
+    //  * attempt reactivation.
+    //  *  
+    //  * @return  void
+    //  * @since   1.4.0
+    //  */
+    // public function scan_for_addons() {
+
+    //     $dirs = array_filter( glob(FOFO_BEC_ADDON_REPO_DIR.'/*'), 'is_dir' );
+    //     foreach( $dirs as $dir ) {
+
+    //         $files = array_filter( glob($dir.'/*'), 'is_file' );
+
+    //         foreach( $files as $file ) {
+
+    //             $expected_headers = [ 
+    //                 FOFO_BEC_EXTENSION_DESCRIPTION_KEY => FOFO_BEC_EXTENSION_DESCRIPTION_KEY, 
+    //                 FOFO_BEC_EXTENSION_NAME_KEY => FOFO_BEC_EXTENSION_NAME_KEY, 
+    //                 FOFO_BEC_EXTENSION_VERSION_KEY => FOFO_BEC_EXTENSION_VERSION_KEY 
+    //             ];
+
+    //             $header = array_change_key_case( $this->get_file_data( $file, $expected_headers ) );
+    //             if( $this->header_validates( $header ) ){
+
+    //                 if( $this->addon_registry->exists( $header[ 'name' ] ) ) {
+
+    //                     $this->addon_registry->update( $header );
+
+    //                 } else {
+
+    //                     $this->addon_registry->add( $header, $file );
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
     /**
      * Scan for addons
      * 
@@ -57,33 +98,9 @@ class FoFo_Bec_Extension_Manager {
      */
     public function scan_for_addons() {
 
-        $dirs = array_filter( glob(FOFO_BEC_ADDON_REPO_DIR.'/*'), 'is_dir' );
-        foreach( $dirs as $dir ) {
-
-            $files = array_filter( glob($dir.'/*'), 'is_file' );
-
-            foreach( $files as $file ) {
-
-                $expected_headers = [ 
-                    FOFO_BEC_EXTENSION_DESCRIPTION_KEY => FOFO_BEC_EXTENSION_DESCRIPTION_KEY, 
-                    FOFO_BEC_EXTENSION_NAME_KEY => FOFO_BEC_EXTENSION_NAME_KEY, 
-                    FOFO_BEC_EXTENSION_VERSION_KEY => FOFO_BEC_EXTENSION_VERSION_KEY 
-                ];
-
-                $header = array_change_key_case( $this->get_file_data( $file, $expected_headers ) );
-                if( $this->header_validates( $header ) ){
-
-                    if( $this->addon_registry->exists( $header[ 'name' ] ) ) {
-
-                        $this->addon_registry->update( $header );
-
-                    } else {
-
-                        $this->addon_registry->add( $header, $file );
-                    }
-                }
-            }
-        }
+        $this->addon_registry->clear_registry();
+        do_action( FOFO_BEC_REGISTER_ADDON, $this->addon_registry );
+        $this->addon_registry->commit_addon_changes();
     }
 
     /**
@@ -169,36 +186,36 @@ class FoFo_Bec_Extension_Manager {
         return false;
     }
 
-    /**
-     * Activate the addon in a 'sandbox' by calling this function through an 
-     * ajax action.
-     * 
-     * @param   string  $addon_name The name of the addon to activate
-     * 
-     * @return  string  'success' if there were no errors activating the addon
-     */
-    public function toggle_addon( $addon_name ) {
+    // /**
+    //  * Activate the addon in a 'sandbox' by calling this function through an 
+    //  * ajax action.
+    //  * 
+    //  * @param   string  $addon_name The name of the addon to activate
+    //  * 
+    //  * @return  string  'success' if there were no errors activating the addon
+    //  */
+    // public function toggle_addon( $addon_name ) {
 
-        $addon = $this->addon_registry->get_addon( $addon_name );
+    //     $addon = $this->addon_registry->get_addon( $addon_name );
 
-        if( $addon->activated === FOFO_BEC_ADDON_DEACTIVATED_STATE ) {
+    //     if( $addon->activated === FOFO_BEC_ADDON_DEACTIVATED_STATE ) {
 
-            include_once( $addon->file_location );
+    //         include_once( $addon->file_location );
 
-            $addon->activated = FOFO_BEC_ADDON_ACTIVATED_STATE;
+    //         $addon->activated = FOFO_BEC_ADDON_ACTIVATED_STATE;
 
-            do_action( FOFO_BEC_ADDON_AFTER_ACTIVATE, $addon_name );
+    //         do_action( FOFO_BEC_ADDON_AFTER_ACTIVATE, $addon_name );
            
-        } else {
+    //     } else {
 
-            $addon->activated = FOFO_BEC_ADDON_DEACTIVATED_STATE;
-            do_action( FOFO_BEC_ADDON_AFTER_DEACTIVATE, $addon_name );
-        }
+    //         $addon->activated = FOFO_BEC_ADDON_DEACTIVATED_STATE;
+    //         do_action( FOFO_BEC_ADDON_AFTER_DEACTIVATE, $addon_name );
+    //     }
 
-        $this->addon_registry->update_addon( $addon );
+    //     $this->addon_registry->update_addon( $addon );
         
-        //If we get this far there hasn't been an error activating the 
-        //addon so we can send the success value back. 
-        return 'success';
-    }
+    //     //If we get this far there hasn't been an error activating the 
+    //     //addon so we can send the success value back. 
+    //     return 'success';
+    // }
 }

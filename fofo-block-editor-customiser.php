@@ -6,7 +6,7 @@
 Plugin Name: Foxdell Folio Block Editor Customiser
 Plugin URI: 
 Description: Provide a set of hooks which will allow features gutenberg features to be turned off
-Version: 1.5.0
+Version: 1.6.0
 Author: Foxdell Folio
 Author URI: 
 License: GPLv2 or later
@@ -82,25 +82,25 @@ function fofo_bec_start() {
     $fofobec->attach();
 }
 
-fofo_bec_start();
+add_action( 'wp_loaded', 'fofo_bec_start' );
 
 
-/**
- * Ajax action to activate an extension. If there is an error
- * in the activation process then the error function in the json
- * call will be activated.
- * 
- * @since	1.4.0
- * @return 	json success.	
- */
-function fofo_bec_toggle_addon() {
+// /**
+//  * Ajax action to activate an extension. If there is an error
+//  * in the activation process then the error function in the json
+//  * call will be activated.
+//  * 
+//  * @since	1.4.0
+//  * @return 	json success.	
+//  */
+// function fofo_bec_toggle_addon() {
 
-	$fofobec = new \FoFoBec\FoFo_Bec();
-	$fofobec->attach();
-	$fofobec->toggle_addon();
-};
+// 	$fofobec = new \FoFoBec\FoFo_Bec();
+// 	$fofobec->attach();
+// 	$fofobec->toggle_addon();
+// };
 
-add_action("wp_ajax_fofo_bec_toggle_addon", "fofo_bec_toggle_addon");
+// add_action("wp_ajax_fofo_bec_toggle_addon", "fofo_bec_toggle_addon");
 
 
 

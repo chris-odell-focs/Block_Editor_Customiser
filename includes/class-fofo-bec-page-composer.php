@@ -211,45 +211,39 @@ class FoFo_Bec_Page_Composer {
      */
     public function build_addon_page( $activate_result ) {
 
-        $alert_message = '';
-        if( 'problem_activating_addon' === $activate_result ) {
-            $alert_message = 'There was an problem activating the addon.';
-        }
+        // $alert_message = '';
+        // if( 'problem_activating_addon' === $activate_result ) {
+        //     $alert_message = 'There was an problem activating the addon.';
+        // }
 
         $addons = $this->addon_registry->list_addons();
         $table_body = '';
         foreach($addons as $key => $addon) {
 
             $table_body .= '<tr>';
-            $activate_nonce = wp_create_nonce('fofo_bec_'.$addon->name);
-            $activate_link = admin_url('admin-ajax.php?action=fofo_bec_activate_addon&nonce='.$activate_nonce.'&addon_name='.$addon->name);
-            $deactivate_link = '';
-            $basefile = basename( $addon->file_location );
-            $value = basename( str_replace( '/'.$basefile, '', $addon->file_location ) ).DIRECTORY_SEPARATOR.$basefile;
-            $table_body = '<th>
-                <input type="hidden" name="'.esc_attr( FOFO_BEC_REQUEST_KEY.'['.$addon->name.']' ).'" value="">
-                <input type="checkbox" name="'.esc_attr( FOFO_BEC_REQUEST_KEY.'['.$addon->name.']' ).'" value="'.esc_attr( $value ).'">
-            </th>
-            <td class="plugin-title column-primary">
+            //$activate_nonce = wp_create_nonce('fofo_bec_'.$addon->name);
+            //$activate_link = admin_url('admin-ajax.php?action=fofo_bec_activate_addon&nonce='.$activate_nonce.'&addon_name='.$addon->name);
+            //$deactivate_link = '';
+            //$basefile = basename( $addon->file_location );
+            //$value = basename( str_replace( '/'.$basefile, '', $addon->file_location ) ).DIRECTORY_SEPARATOR.$basefile;
+            // $table_body = '<th>
+            //     <input type="hidden" name="'.esc_attr( FOFO_BEC_REQUEST_KEY.'['.$addon->name.']' ).'" value="">
+            //     <input type="checkbox" name="'.esc_attr( FOFO_BEC_REQUEST_KEY.'['.$addon->name.']' ).'" value="'.esc_attr( $value ).'">
+            // </th>
+            $table_body = '<td class="plugin-title column-primary">
                 '.$addon->display_name.'
-                <div class="row-actions visible toggle-addon" data-addon_name="'.$addon->name.'" data-nonce="'.$activate_nonce.'">
-                    '.($addon->activated !== FOFO_BEC_ADDON_ACTIVATED_STATE ? '<a href="'.$activate_link.'" class="edit">Activate</a>' : '<a href="'.$deactivate_link.'" class="edit">Deactivate</a>' ).'
-                </div>
             </td>
             <td class="manage-column column-description">'.$addon->description.'</td>';
 
             $table_body .= '</tr>';
         }
 
-        $error_class = $alert_message === '' ? '' : 'error';
+        //$error_class = $alert_message === '' ? '' : 'error';
 
         $page = '
             <div class="wrap">
                 <h1>Foxdell Folio Block Editor Customiser Add Ons</h1>
-                <div class="'.$error_class.'">'.$alert_message.'</div>
-                <form method="post" action="admin.php?page=fofo_bec_plugin_page_addons" novalidate="novalidate">
-                    '.wp_nonce_field( $this->nonce_key, '_wpnonce', true, false ).
-                    '<table class="wp-list-table widefat">
+                    <table class="wp-list-table widefat">
                         <thead>
                         <tr>
                             <th class="manage-column column-cb check-column"></th>
@@ -259,8 +253,6 @@ class FoFo_Bec_Page_Composer {
                         </thead>
                         <tbody>'.$table_body.'</tbody>
                     </table>
-                    <p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes"></p>
-                </form>
             </div>
         ';
 

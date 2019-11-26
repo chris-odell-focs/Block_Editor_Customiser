@@ -131,6 +131,7 @@ class FoFo_Bec {
         $this->extenstion_manager->scan_for_themes();
         $this->current_bec_theme = $this->theme_registry->get_current_theme();
 
+        $this->extenstion_manager->scan_for_addons();
         $this->addon_registry->load_addons();
     }
 
