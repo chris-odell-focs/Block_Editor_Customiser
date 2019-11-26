@@ -17,6 +17,18 @@ class FoFo_Bec_Addon_Registry {
     private $dal;
 
     /**
+     * The registry of addons
+     * 
+     * @var array {
+     *      @type   string  $key    The name off the addon
+     *      @type   \FoFoBec\FoFo_Bec_Addon $addon  An addon instance
+     * }
+     * 
+     * @since 1.6.0
+     */
+    private $registry;
+
+    /**
      * Initialisation
      * 
      * @param   FoFoBec\FoFo_Bec_Dal    $dal    Injected data access layer instance.
@@ -26,7 +38,6 @@ class FoFo_Bec_Addon_Registry {
     public function __construct( $dal ) {
 
         $this->dal = $dal;
-        //$this->registry_cache = null;
     }
 
     /**
@@ -48,38 +59,9 @@ class FoFo_Bec_Addon_Registry {
      */
     public function exists( $addon_name ) {
 
-        $registry = $this->get_registry();
+        $this->ensure_registry();
         $addon_name = $this->sanitize_addon_name( $addon_name );
-        return array_key_exists( $addon_name, $registry );
-    }
-
-    /**
-     * Update an add on if the version number has changed.
-     * 
-     * @param   array {
-     *      @type   string  $key    The header item key
-     *      @type   string  $value  The header item value
-     * }
-     * 
-     * @return  void
-     * @since   1.4.0
-     */
-    public function update( $header ) {
-
-        $name = $this->sanitize_addon_name( $header[ FOFO_BEC_EXTENSION_NAME_KEY ] );
-        $version = $header[ FOFO_BEC_EXTENSION_VERSION_KEY ];
-        $addon = $this->get_addon( $name );
-        if( $addon->version !== $version ) {
-
-            $addon->version = $version;
-            $addon->name = $name;
-            $addon->display_name = $header[ FOFO_BEC_EXTENSION_NAME_KEY ];
-            $addon->description = $header[ FOFO_BEC_EXTENSION_DESCRIPTION_KEY ];
-
-            $registry = $this->get_registry();
-            $registry[ $name ] = $addon;
-            $this->save( $registry );
-        }
+        return array_key_exists( $addon_name, $this->registry );
     }
 
     /**
@@ -103,10 +85,8 @@ class FoFo_Bec_Addon_Registry {
         $addon->file_location = $file;
         $addon->activated = FOFO_BEC_ADDON_DEACTIVATED_STATE;
 
-        $registry = $this->get_registry();
-        $registry[ $addon->name ] = $addon;
-
-        $this->save( $registry );
+        $this->ensure_registry();
+        $this->registry[ $addon->name ] = $addon;
     }
 
     /**
@@ -132,33 +112,17 @@ class FoFo_Bec_Addon_Registry {
      */
     public function get_addon( $addon_name ) {
 
-        $registry = $this->get_registry();
-        if( array_key_exists( $addon_name, $registry ) ) {
+        $this->ensure_registry();
+        if( array_key_exists( $addon_name, $this->registry ) ) {
 
-            return $registry[ $addon_name ];
+            return $this->registry[ $addon_name ];
         }
 
         throw new \Exception('add on '.$addon_name.' could not be found'); 
     }
 
     /**
-     * Update an addon.
-     * 
-     * This differs from update in that update works based on the header information
-     * whereas this functions updates the addon instance.
-     * 
-     * @return void
-     * @since 1.4.0
-     */
-    public function update_addon( $addon ) {
-
-        $registry = $this->get_registry();
-        $registry[ $addon->name ] = $addon;
-        $this->save( $registry );
-    }
-
-    /**
-     * Save updates to the registry.
+     * Commit updates to the registry.
      * 
      * @param   array {
      *      @type   string  $name
@@ -166,9 +130,9 @@ class FoFo_Bec_Addon_Registry {
      * }
      * @since 1.4.0
      */
-    private function save( $registry ) {
+    public function commit_addon_changes() {
 
-        $this->dal->set_addons( $registry );
+        $this->dal->set_addons( $this->registry );
     }
 
     /**
@@ -182,21 +146,22 @@ class FoFo_Bec_Addon_Registry {
      */
     public function list_addons() {
 
-        return $this->get_registry();
+        $this->ensure_registry();
+        return $this->registry;
     }
 
     /**
-     * Get the registry of add ons
+     * Ensure the registry instance is populated
      * 
-     * @return array {
-     *      @type       string                  $key        The addon name
-     *      @type       \FoFoBec\FoFo_Bec_Addon $addon      Instance of addd on class
-     * }
-     * @since   1.4.0
+     * @return  void
+     * @since   1.6.0
      */
-    private function get_registry() {
+    private function ensure_registry() {
 
-        return $this->dal->get_addons();
+        if( $this->registry === null ) {
+
+            $this->registry = $this->dal->get_addons();
+        }
     }
 
     /**
@@ -207,7 +172,8 @@ class FoFo_Bec_Addon_Registry {
      */
     public function clear_registry() {
 
-        $this->save([]);
+        $this->registry = [];
+        $this->commit_addon_changes();
     }
 
     /**
@@ -220,14 +186,14 @@ class FoFo_Bec_Addon_Registry {
      */
     public function load_addons() {
 
-        $addons = $this->get_registry();
-        foreach( $addons as $key => $addon ) {
+        $this->ensure_registry();
+
+        foreach( $this->registry as $key => $addon ) {
 
             if( FOFO_BEC_ADDON_ACTIVATED_STATE === $addon->activated ) {
 
                 include_once( $addon->file_location );
             }
-        }        
-
+        }
     }
 }

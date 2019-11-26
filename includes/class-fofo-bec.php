@@ -131,6 +131,7 @@ class FoFo_Bec {
         $this->extenstion_manager->scan_for_themes();
         $this->current_bec_theme = $this->theme_registry->get_current_theme();
 
+        $this->extenstion_manager->scan_for_addons();
         $this->addon_registry->load_addons();
     }
 
@@ -200,21 +201,6 @@ class FoFo_Bec {
         );
 
         wp_enqueue_script( 'fofobec-js' );
-
-        wp_register_script( 
-            'fofobec-addon-js', 
-            plugin_dir_url( __FILE__ ) . '../js/fofobec_addon.js', 
-            '1.0.2', 
-            true 
-        );
-
-        wp_localize_script(
-            'fofobec-addon-js', 
-            'fofobec_addon',
-            [ 'ajaxurl'  => admin_url( 'admin-ajax.php' ) ]
-        );
-
-        wp_enqueue_script( 'fofobec-addon-js' );
 
         $dal = new \FoFoBec\FoFo_Bec_Dal();
         $theme_registry = new \FoFoBec\FoFo_Bec_Theme_Registry( $dal );

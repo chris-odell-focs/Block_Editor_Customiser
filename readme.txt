@@ -4,7 +4,7 @@ Donate link: https://ko-fi.com/chrisodell
 Tags: gutenberg, block-editor, customize
 Requires at least: 5.1
 Tested up to: 5.2.3
-Stable tag: 1.5.1
+Stable tag: 1.6.0
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -66,6 +66,29 @@ It can also be installed manually.
 1. The FoFo Block Customiser screen (1.png).
 
 == Changelog ==
+
+= 1.6.0 =
+
+* ** BREAKING CHANGE ** Addons are no longer added in their own folder but now need to be written and installed as a plugin in their own right.
+* Removed function 'fofo_bec_toggle_addon' in file fofo-block-editor-customiser.php.
+* Added an addon instance to the 'FoFo_Bec_Addon_Registry' class in the file class-fofo-bec-addon-registry.php.
+* Added the 'ensure_registry' function to class 'FoFo_Bec_Addon_Registry'.
+* Modified the 'add' function in class 'FoFo_Bec_Addon_Registry' to use the member level registry variable.
+* Modified the 'get_addon' in class 'FoFo_Bec_Addon_Registry' to use the member level registry variable.
+* Removed the 'update_addon' function in class 'FoFo_Bec_Addon_Registry'.
+* Removed the 'save' function in class 'FoFo_Bec_Addon_Registry'.
+* Added the 'commit_addon_changes' function in class 'FoFo_Bec_Addon_Registry'.
+* Removed the 'get_registry' function in class 'FoFo_Bec_Addon_Registry'.
+* Modified the 'scan_for_addons' function in class 'FoFo_Bec_Extension_Manager' in file class-fofo-bec-extension-manager.php to pick up registered addons as plugins.
+* Removed the 'get_file_data' function in class 'FoFo_Bec_Extension_Manager'.
+* Removed the 'header_validates' function in class 'FoFo_Bec_Extension_Manager'.
+* Removed the 'toggle_addon' function in class 'FoFo_Bec_Extension_Manager'.
+* Modified the 'build_addon_page' in class 'FoFo_Bec_Page_Composer' in file class-fofo-bec-page-composer.php to remove activation links.
+* Removed definition for FOFO_BEC_ADDON_AJAX_ARGS_KEY in class 'FoFo_Bec_Shared' in file class-fofo-bec-shared.php.
+* Added defintion for FOFO_BEC_REGISTER_ADDON hook in class 'FoFo_Bec_Shared'.
+* Modified function 'attach' in class 'FoFo_Bec' in file class-fofo-bec.php to scan for addons.
+* Removed loading of addon script in class 'FoFo_Bec'.
+* Correction of typo in readme.txt.
 
 = 1.5.1 =
 
@@ -199,5 +222,5 @@ Customise your Block Editor experience
 
 == FAQ ==
 
-Q. What features can I disbale?
+Q. What features can I disable?
 A. At the moment the only features that can be disabled are those listed at the top of this page.
