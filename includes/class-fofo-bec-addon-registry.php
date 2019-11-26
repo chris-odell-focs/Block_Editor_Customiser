@@ -38,7 +38,6 @@ class FoFo_Bec_Addon_Registry {
     public function __construct( $dal ) {
 
         $this->dal = $dal;
-        //$this->registry_cache = null;
     }
 
     /**
@@ -60,40 +59,10 @@ class FoFo_Bec_Addon_Registry {
      */
     public function exists( $addon_name ) {
 
-        //$registry = $this->get_registry();
         $this->ensure_registry();
         $addon_name = $this->sanitize_addon_name( $addon_name );
         return array_key_exists( $addon_name, $this->registry );
     }
-
-    // /**
-    //  * Update an add on if the version number has changed.
-    //  * 
-    //  * @param   array {
-    //  *      @type   string  $key    The header item key
-    //  *      @type   string  $value  The header item value
-    //  * }
-    //  * 
-    //  * @return  void
-    //  * @since   1.4.0
-    //  */
-    // public function update( $header ) {
-
-    //     $name = $this->sanitize_addon_name( $header[ FOFO_BEC_EXTENSION_NAME_KEY ] );
-    //     $version = $header[ FOFO_BEC_EXTENSION_VERSION_KEY ];
-    //     $addon = $this->get_addon( $name );
-    //     if( $addon->version !== $version ) {
-
-    //         $addon->version = $version;
-    //         $addon->name = $name;
-    //         $addon->display_name = $header[ FOFO_BEC_EXTENSION_NAME_KEY ];
-    //         $addon->description = $header[ FOFO_BEC_EXTENSION_DESCRIPTION_KEY ];
-
-    //         $registry = $this->get_registry();
-    //         $registry[ $name ] = $addon;
-    //         $this->save( $registry );
-    //     }
-    // }
 
     /**
      * Add a new add on to the registry.
@@ -117,10 +86,7 @@ class FoFo_Bec_Addon_Registry {
         $addon->activated = FOFO_BEC_ADDON_DEACTIVATED_STATE;
 
         $this->ensure_registry();
-        //$registry = $this->get_registry();
         $this->registry[ $addon->name ] = $addon;
-
-        //$this->save( $registry );
     }
 
     /**
@@ -146,7 +112,6 @@ class FoFo_Bec_Addon_Registry {
      */
     public function get_addon( $addon_name ) {
 
-        //$registry = $this->get_registry();
         $this->ensure_registry();
         if( array_key_exists( $addon_name, $this->registry ) ) {
 
@@ -155,23 +120,6 @@ class FoFo_Bec_Addon_Registry {
 
         throw new \Exception('add on '.$addon_name.' could not be found'); 
     }
-
-    // /**
-    //  * Update an addon.
-    //  * 
-    //  * This differs from update in that update works based on the header information
-    //  * whereas this functions updates the addon instance.
-    //  * 
-    //  * @return void
-    //  * @since 1.4.0
-    //  */
-    // public function update_addon( $addon ) {
-
-    //     //$registry = $this->get_registry();
-    //     $this->ensure_registry();
-    //     $this->registry[ $addon->name ] = $addon;
-    //     $this->commit_addon_changes();
-    // }
 
     /**
      * Commit updates to the registry.
@@ -202,26 +150,12 @@ class FoFo_Bec_Addon_Registry {
         return $this->registry;
     }
 
-    // /**
-    //  * Get the registry of add ons
-    //  * 
-    //  * @return array {
-    //  *      @type       string                  $key        The addon name
-    //  *      @type       \FoFoBec\FoFo_Bec_Addon $addon      Instance of addd on class
-    //  * }
-    //  * @since   1.4.0
-    //  */
-    // private function get_registry() {
-
-    //     //return $this->dal->get_addons();
-    //     if( $this->registry === null ) {
-
-    //         $this->registry = $this->dal->get_addons();
-    //     }
-
-    //     return $this->registry;
-    // }
-
+    /**
+     * Ensure the registry instance is populated
+     * 
+     * @return  void
+     * @since   1.6.0
+     */
     private function ensure_registry() {
 
         if( $this->registry === null ) {
@@ -252,7 +186,6 @@ class FoFo_Bec_Addon_Registry {
      */
     public function load_addons() {
 
-        //$addons = $this->get_registry();
         $this->ensure_registry();
 
         foreach( $this->registry as $key => $addon ) {
@@ -261,7 +194,6 @@ class FoFo_Bec_Addon_Registry {
 
                 include_once( $addon->file_location );
             }
-        }        
-
+        }
     }
 }

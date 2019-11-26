@@ -98,14 +98,6 @@ class FoFo_Bec_Shared {
             define( 'FOFO_BEC_ADDON_DEACTIVATED_STATE', 'no' );
         }
 
-        // if( !defined( 'FOFO_BEC_ADDON_AJAX_NAME_KEY' ) ) {
-        //     define( 'FOFO_BEC_ADDON_AJAX_NAME_KEY', 'name' );
-        // }
-
-        // if( !defined( 'FOFO_BEC_ADDON_AJAX_ARGS_KEY' ) ) {
-        //     define( 'FOFO_BEC_ADDON_AJAX_ARGS_KEY', 'args' );
-        // }
-
         if( !defined( 'FOFO_BEC_REGISTER_ADDON' ) ) {
             define( 'FOFO_BEC_REGISTER_ADDON', 'fofo_bec_register_addon' );
         }
